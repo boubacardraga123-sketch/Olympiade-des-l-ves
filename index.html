@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6366f1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Club Réussir Ensemble">
+<meta name="description" content="Club Réussir Ensemble — Compétition QCM">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Club Réussir Ensemble</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f4f8;font-family:'DM Sans',sans-serif;min-height:100vh;padding:16px;color:#1a1f2e}
+h1,h2,h3{font-family:'Syne',sans-serif;font-weight:800;color:#1a1f2e}
+.hidden{display:none!important}
+.wrap{max-width:760px;margin:0 auto}
+
+/* ── HEADER ── */
+.app-header{background:#1a1f2e;border-radius:16px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:#fff}
+.app-header .avatar{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.app-header .info{flex:1;min-width:150px}
+.app-header .name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800}
+.app-header .sub{font-size:12px;color:#94a3b8;margin-top:1px}
+.install-btn{background:#25d366;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;margin-bottom:14px;background:#fff;border-radius:12px;padding:4px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow-x:auto}
+.tab{padding:9px 16px;border-radius:9px;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;background:transparent;color:#64748b;white-space:nowrap;transition:all .15s}
+.tab.active{background:#6366f1;color:#fff;box-shadow:0 2px 8px rgba(99,102,241,.3)}
+
+/* ── CARD ── */
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+
+/* ── FORM ── */
+label.f-label{display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:4px;margin-top:10px}
+input[type=text],input[type=number],input[type=tel],input[type=email],select,textarea{width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:#6366f1}
+textarea{resize:vertical;min-height:44px}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 14px;border-radius:10px;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:#6366f1;color:#fff}
+.btn-primary:hover{background:#4f52e0}
+.btn-green{background:#25d366;color:#fff}
+.btn-ghost{background:#e0e7ff;color:#4338ca}
+.btn-danger{background:#fee2e2;color:#ef4444}
+.btn-dark{background:#1a1f2e;color:#fff}
+.btn-sm{padding:6px 10px;font-size:11.5px;border-radius:8px}
+.btn:active{opacity:.8}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* ── LIST ROW ── */
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9;flex-wrap:wrap}
+.row:last-child{border-bottom:none}
+.row .main{flex:1;min-width:140px}
+.row .main .t1{font-weight:700;font-size:13.5px;color:#1a1f2e}
+.row .main .t2{font-size:11.5px;color:#64748b;margin-top:1px}
+.chip{font-size:10.5px;font-weight:700;border-radius:20px;padding:2px 9px;white-space:nowrap}
+.chip-indigo{background:#eef2ff;color:#4338ca}
+.chip-green{background:#dcfce7;color:#15803d}
+.chip-red{background:#fee2e2;color:#dc2626}
+.chip-gray{background:#f1f5f9;color:#64748b}
+.empty{text-align:center;color:#94a3b8;font-size:13px;padding:26px 10px}
+
+/* ── QUESTION BUILDER ── */
+.q-block{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;margin-top:10px;position:relative}
+.q-block .q-num{font-size:11px;font-weight:800;color:#6366f1;margin-bottom:6px}
+.q-opt-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.q-opt-row input[type=radio]{width:16px;height:16px;flex-shrink:0;accent-color:#6366f1}
+.q-remove{position:absolute;top:8px;right:8px;background:#fee2e2;color:#ef4444;border:none;border-radius:6px;width:24px;height:24px;font-size:12px;cursor:pointer}
+
+/* ── QUIZ TAKING ── */
+.timer-bar{position:sticky;top:8px;z-index:20;background:#1a1f2e;color:#fff;border-radius:14px;padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.timer-bar .tval{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:#25d366}
+.timer-bar.low .tval{color:#ef4444}
+.question-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.question-card .qtxt{font-weight:700;font-size:14px;margin-bottom:10px;line-height:1.4}
+.question-card .opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;margin-bottom:7px;cursor:pointer;font-size:13px}
+.question-card .opt:hover{background:#f8fafc}
+.question-card .opt.checked{background:#eef2ff;border-color:#6366f1;font-weight:600}
+.question-card .opt input{margin-top:2px;accent-color:#6366f1}
+
+/* ── RESULT SCREEN ── */
+.result-hero{background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:18px;padding:30px 20px;text-align:center;color:#fff;margin-bottom:14px}
+.result-score{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;line-height:1}
+.result-pct{font-size:14px;opacity:.9;margin-top:6px}
+
+/* ── LEADERBOARD ── */
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:10px}
+.lb-row:nth-child(odd){background:#f8fafc}
+.lb-rank{width:26px;text-align:center;font-weight:800;font-size:13px;color:#64748b;flex-shrink:0}
+.lb-name{flex:1;font-weight:700;font-size:13px;color:#1a1f2e}
+.lb-sub{font-size:11px;color:#94a3b8}
+.lb-score{font-family:'DM Mono',monospace;font-weight:700;font-size:13px;color:#6366f1}
+
+/* ── MISC ── */
+.spinner{width:26px;height:26px;border:3px solid #e2e8f0;border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite;margin:20px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1f2e;color:#fff;padding:11px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:opacity .25s}
+.toast.show{opacity:1}
+.center-box{max-width:400px;margin:60px auto;text-align:center}
+.center-box .icon{font-size:44px;margin-bottom:10px}
+.center-box p{color:#64748b;font-size:13.5px;margin-top:6px;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+<div id="app" class="wrap">
+  <div class="spinner"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection,
+         addDoc, query, where, onSnapshot, deleteDoc, updateDoc
+       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ── Même projet Firebase que "Emploi du temps" (synchronisation des élèves) ── */
+const firebaseConfig = {
+  apiKey: "AIzaSyBYeYPOptN2wEak_Ctcr4a8t5qXpj4riLE",
+  authDomain: "emploi-temps.firebaseapp.com",
+  projectId: "emploi-temps",
+  storageBucket: "emploi-temps.firebasestorage.app",
+  messagingSenderId: "665985283894",
+  appId: "1:665985283894:web:b0c4cb14824bb8fed9a597"
+};
+const fbApp = initializeApp(firebaseConfig);
+const fbDB  = getFirestore(fbApp);
+
+/* ── Code d'accès formateur — à modifier ── */
+const ADMIN_CODE = "REUSSIR2026";
+
+/* ── Collections ── */
+const C_ELEVES   = 'qcmc_eleves';
+const C_QUIZ     = 'qcmc_quiz';
+const C_RESULT   = 'qcmc_resultats';
+const C_ROSTER   = 'edtxRoster'; // roster synchronisé depuis "Emploi du temps"
+const C_CONFIG   = 'qcmc_config'; // état global de la compétition (tour actif)
+
+/* ── Tours de la compétition (progression séquentielle, un seul actif à la fois) ── */
+const TOURS = [
+  { key:'16e',   label:'16èmes de finale', niveau:'QCM Collège' },
+  { key:'8e',    label:'8èmes de finale',  niveau:'QCM Collège' },
+  { key:'4e',    label:'4èmes de finale',  niveau:'QCM Lycée Seconde' },
+  { key:'demi',  label:'Demi-finale',      niveau:'QCM Lycée Première' },
+  { key:'finale',label:'Finale',           niveau:'Terminale SM / SE + Culture Générale' }
+];
+function tourInfo(key){ return TOURS.find(t=>t.key===key) || null; }
+function tourLabel(key){ const t=tourInfo(key); return t ? `${t.label} — ${t.niveau}` : '—'; }
+
+let currentTourActif = '16e';
+let unsubTourGlobal = null;
+function watchTourActif(cb){
+  if(unsubTourGlobal) unsubTourGlobal();
+  unsubTourGlobal = onSnapshot(doc(fbDB, C_CONFIG, 'etat'), snap=>{
+    currentTourActif = (snap.exists() && snap.data().tourActif) || '16e';
+    if(cb) cb();
+  });
+}
+function detectFiliere(nomClasse){
+  const n = (nomClasse||'').toUpperCase();
+  if(/\bSM\b/.test(n)) return 'SM';
+  if(/\bSE\b/.test(n)) return 'SE';
+  return null;
+}
+
+/* ── Helpers ── */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(window._tTO); window._tTO=setTimeout(()=>t.classList.remove('show'),2600); }
+function genToken(){ const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let t=''; for(let i=0;i<8;i++) t+=chars[Math.floor(Math.random()*chars.length)]; return t; }
+function fmtTime(sec){ sec=Math.max(0,Math.round(sec)); const m=Math.floor(sec/60), s=sec%60; return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
+function shuffledIndices(n){ const a=[...Array(n).keys()]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function baseUrl(){ return `${window.location.origin}${window.location.pathname}`; }
+function studentLink(token){ return `${baseUrl()}?code=${token}`; }
+const LS_TOKEN_KEY = 'qcmc_student_token';
+function saveStudentToken(token){ try{ localStorage.setItem(LS_TOKEN_KEY, token); }catch(e){} }
+function getSavedStudentToken(){ try{ return localStorage.getItem(LS_TOKEN_KEY); }catch(e){ return null; } }
+function clearSavedStudentToken(){ try{ localStorage.removeItem(LS_TOKEN_KEY); }catch(e){} }
+
+/* ── PWA install prompt ── */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; const b=document.getElementById('installBtn'); if(b) b.classList.remove('hidden'); });
+window.doInstall = async function(){ if(!deferredPrompt){ toast('📲 Utilisez le menu du navigateur : "Ajouter à l\'écran d\'accueil".'); return; } deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; };
+
+if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+
+const app = document.getElementById('app');
+const params = new URLSearchParams(window.location.search);
+const studentCode = params.get('code');
+const isAdmin = params.get('admin') === '1';
+
+if (studentCode) {
+  saveStudentToken(studentCode);
+  bootStudent(studentCode);
+} else if (isAdmin) {
+  bootAdmin();
+} else {
+  const savedToken = getSavedStudentToken();
+  if (savedToken) {
+    bootStudent(savedToken);
+  } else {
+    app.innerHTML = `
+      <div class="center-box">
+        <div class="icon">🏆</div>
+        <h2>Club Réussir Ensemble</h2>
+        <p>Ce lien est personnel. Demandez à votre formateur le lien qui vous a été envoyé pour accéder à votre espace.</p>
+        <div class="btn-row" style="justify-content:center;margin-top:20px">
+          <button class="btn btn-ghost btn-sm" onclick="location.href=location.pathname+'?admin=1'">🔑 Accès formateur</button>
+        </div>
+      </div>`;
+  }
+}
+
+/* ══════════════════════════════ ADMIN ══════════════════════════════ */
+function bootAdmin(){
+  if (sessionStorage.getItem('qcmcAdminOK') !== '1') {
+    const pass = prompt('🔑 Code formateur :');
+    if (pass !== ADMIN_CODE) { app.innerHTML = `<div class="center-box"><div class="icon">⛔</div><h2>Accès refusé</h2><p>Code incorrect.</p><div class="btn-row" style="justify-content:center;margin-top:16px"><button class="btn btn-primary btn-sm" onclick="location.reload()">Réessayer</button></div></div>`; return; }
+    sessionStorage.setItem('qcmcAdminOK','1');
+  }
+  renderAdminShell();
+  watchTourActif(()=>{
+    const badge = document.getElementById('tourBadgeAdmin');
+    if(badge) badge.textContent = tourLabel(currentTourActif);
+    const sel = document.getElementById('tourActifSelect');
+    if(sel) sel.value = currentTourActif;
+  });
+  watchRosterAutoSync();
+}
+
+let adminTab = 'eleves';
+function renderAdminShell(){
+  app.innerHTML = `
+    <div class="app-header">
+      <div class="avatar">🏆</div>
+      <div class="info"><div class="name">Club Réussir Ensemble</div><div class="sub">Compétition QCM · Espace formateur · Tour : <span id="tourBadgeAdmin">${esc(tourLabel(currentTourActif))}</span></div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab" data-t="eleves">👥 Élèves</button>
+      <button class="tab" data-t="quiz">📝 Quiz</button>
+      <button class="tab" data-t="classement">🏅 Classement</button>
+    </div>
+    <div id="tabBody"></div>`;
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ adminTab=b.dataset.t; paintAdminTabs(); renderAdminTab(); });
+  paintAdminTabs();
+  renderAdminTab();
+}
+function paintAdminTabs(){ app.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.t===adminTab)); }
+function renderAdminTab(){
+  if(adminTab==='eleves') renderAdminEleves();
+  else if(adminTab==='quiz') renderAdminQuiz();
+  else renderAdminClassement();
+}
+
+/* ── Élèves ── */
+let unsubEleves=null;
+function renderAdminEleves(){
+  const body = document.getElementById('tabBody');
+  body.innerHTML = `
+    <div class="card">
+      <div class="card-title">🔄 Synchronisation automatique — Emploi du temps</div>
+      <div style="font-size:12.5px;color:#64748b;margin-bottom:8px" id="rosterSyncStatus">Synchronisation en temps réel active. Tout élève ajouté dans "Emploi du temps" apparaît ici automatiquement, sans action de votre part.</div>
+      <div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="forceRosterSync()">🔄 Resynchroniser maintenant</button></div>
+    </div>
+    <div class="card">
+      <div class="card-title">➕ Ajouter un élève manuellement</div>
+      <label class="f-label">Nom complet</label><input type="text" id="el-nom" placeholder="Nom et prénom">
+      <label class="f-label">Classe</label><input type="text" id="el-classe" placeholder="Ex : 3ème A">
+      <label class="f-label">Filière (Terminale uniquement — pour la Finale)</label>
+      <select id="el-filiere"><option value="">—</option><option value="SM">SM</option><option value="SE">SE</option></select>
+      <label class="f-label">Téléphone WhatsApp (optionnel)</label><input type="tel" id="el-tel" placeholder="Ex : 622000000">
+      <label class="f-label">E-mail (optionnel)</label><input type="email" id="el-email" placeholder="email@exemple.com">
+      <div class="btn-row"><button class="btn btn-primary" onclick="addEleveManuel()">Créer le lien personnel</button></div>
+    </div>
+    <div class="card">
+      <div class="card-title">👥 Élèves inscrits</div>
+      <div id="elevesList"><div class="spinner"></div></div>
+    </div>`;
+  if(unsubEleves) unsubEleves();
+  unsubEleves = onSnapshot(collection(fbDB, C_ELEVES), snap=>{
+    const list = snap.docs.map(d=>d.data()).sort((a,b)=> (a.classe||'').localeCompare(b.classe||'') || (a.nom||'').localeCompare(b.nom||''));
+    window._elevesCache = list;
+    const el = document.getElementById('elevesList');
+    if(!el) return;
+    if(!list.length){ el.innerHTML = '<div class="empty">Aucun élève pour le moment.</div>'; return; }
+    el.innerHTML = list.map(e=>`
+      <div class="row">
+        <div class="main">
+          <div class="t1">${esc(e.nom)} <span class="chip chip-indigo">${esc(e.classe||'—')}</span> ${e.filiere?`<span class="chip chip-indigo">${esc(e.filiere)}</span>`:''}</div>
+          <div class="t2">Token : ${esc(e.token)}</div>
+          <select class="btn-sm" style="margin-top:6px;max-width:160px" onchange="setEleveFiliere('${e.token}', this.value)">
+            <option value="" ${!e.filiere?'selected':''}>Filière —</option>
+            <option value="SM" ${e.filiere==='SM'?'selected':''}>SM</option>
+            <option value="SE" ${e.filiere==='SE'?'selected':''}>SE</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="copyEleveLink('${e.token}')">🔗 Copier</button>
+        <button class="btn btn-green btn-sm" onclick="sendEleveWA('${e.token}','${esc(e.nom).replace(/'/g,"\\'")}','${e.tel||''}')">📲</button>
+        <button class="btn btn-dark btn-sm" onclick="sendEleveMail('${e.token}','${esc(e.nom).replace(/'/g,"\\'")}','${e.email||''}')">✉️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteEleve('${e.token}','${esc(e.nom).replace(/'/g,"\\'")}')">🗑️</button>
+      </div>`).join('');
+  });
+}
+
+let unsubRoster = null;
+let rosterSyncBusy = false;
+function watchRosterAutoSync(){
+  if(unsubRoster) unsubRoster();
+  unsubRoster = onSnapshot(collection(fbDB, C_ROSTER), snap=>{
+    const classes = snap.docs.map(d=>({ id:d.id, ...d.data() })).filter(c=>c.eleves && c.eleves.length);
+    window._rosterCache = classes;
+    syncRosterToEleves(classes);
+  });
+}
+async function syncRosterToEleves(classes){
+  if(rosterSyncBusy) return; // évite les synchros concurrentes si plusieurs mises à jour arrivent d'un coup
+  rosterSyncBusy = true;
+  try{
+    let existing;
+    try{ existing = window._elevesCache || (await getDocs(collection(fbDB, C_ELEVES))).docs.map(d=>d.data()); }
+    catch(e){ existing = []; }
+    let created = 0;
+    for(const grp of classes){
+      for(const e of (grp.eleves||[])){
+        const fullName = [e.name, e.prenom].filter(Boolean).join(' ').trim();
+        if(!fullName) continue;
+        const already = existing.some(x=> (x.nom||'').trim().toLowerCase()===fullName.toLowerCase() && (x.classe||'').trim().toLowerCase()===(grp.name||'').trim().toLowerCase());
+        if(already) continue;
+        const token = genToken();
+        try{
+          await setDoc(doc(fbDB, C_ELEVES, token), { token, nom: fullName, classe: grp.name||'', filiere: detectFiliere(grp.name), tel:null, email:null, createdAt: Date.now(), source:'roster-sync' });
+          existing.push({ token, nom: fullName, classe: grp.name||'' }); // évite les doublons si plusieurs classes citent le même nom
+          created++;
+        }catch(err){}
+      }
+    }
+    if(created){
+      toast(`🔄 Synchro Emploi du temps : ${created} nouvel(aux) élève(s) ajouté(s) automatiquement.`);
+      const status = document.getElementById('rosterSyncStatus');
+      if(status) status.textContent = `Synchronisation en temps réel active. Dernière synchro : +${created} élève(s) à l'instant.`;
+    }
+  }finally{
+    rosterSyncBusy = false;
+  }
+}
+window.forceRosterSync = async function(){
+  toast('🔄 Resynchronisation en cours…');
+  await syncRosterToEleves(window._rosterCache || []);
+  toast('✅ Resynchronisation terminée.');
+};
+
+window.addEleveManuel = async function(){
+  const nom = document.getElementById('el-nom').value.trim();
+  const classe = document.getElementById('el-classe').value.trim();
+  const filiere = document.getElementById('el-filiere').value.trim();
+  const tel = document.getElementById('el-tel').value.trim();
+  const email = document.getElementById('el-email').value.trim();
+  if(!nom){ toast('⚠️ Le nom est obligatoire.'); return; }
+  const token = genToken();
+  try{
+    await setDoc(doc(fbDB, C_ELEVES, token), { token, nom, classe: classe||'', filiere: filiere||null, tel: tel||null, email: email||null, createdAt: Date.now() });
+  }catch(e){ toast('❌ Erreur : '+e.message); return; }
+  document.getElementById('el-nom').value=''; document.getElementById('el-classe').value='';
+  document.getElementById('el-filiere').value='';
+  document.getElementById('el-tel').value=''; document.getElementById('el-email').value='';
+  toast('✅ Élève créé.');
+  if(tel && confirm(`Envoyer le lien à ${nom} sur WhatsApp maintenant ?`)) sendEleveWA(token, nom, tel);
+  else if(email && confirm(`Envoyer le lien à ${nom} par e-mail maintenant ?`)) sendEleveMail(token, nom, email);
+};
+
+window.copyEleveLink = function(token){
+  const url = studentLink(token);
+  navigator.clipboard.writeText(url).then(()=>toast('🔗 Lien copié !')).catch(()=>toast('Lien : '+url));
+};
+window.sendEleveWA = function(token, nom, tel){
+  const url = studentLink(token);
+  const msg = encodeURIComponent(`🏆 *Bonjour ${nom} !*\n\nTu es inscrit(e) à la Compétition QCM du Club Réussir Ensemble. Ouvre ton espace personnel ici :\n${url}\n\n📲 Installe l'application depuis ce lien pour un accès rapide.\n\nBonne chance ! 💪`);
+  const phone = (tel||'').replace(/\D/g,'');
+  window.open(phone ? `https://wa.me/${phone}?text=${msg}` : `https://wa.me/?text=${msg}`, '_blank');
+};
+window.sendEleveMail = function(token, nom, email){
+  const url = studentLink(token);
+  const sujet = encodeURIComponent('Ton accès à la Compétition QCM — Club Réussir Ensemble');
+  const corps = encodeURIComponent(`Bonjour ${nom},\n\nTu es inscrit(e) à la Compétition QCM du Club Réussir Ensemble. Ouvre ton espace personnel ici :\n\n${url}\n\nBonne chance !`);
+  window.open(`mailto:${email||''}?subject=${sujet}&body=${corps}`, '_blank');
+};
+window.setEleveFiliere = async function(token, val){
+  try{ await updateDoc(doc(fbDB, C_ELEVES, token), { filiere: val||null }); toast('✅ Filière mise à jour.'); }
+  catch(e){ toast('❌ Erreur.'); }
+};
+window.deleteEleve = async function(token, nom){
+  if(!confirm(`Supprimer "${nom}" ? Ses résultats resteront enregistrés mais son lien ne fonctionnera plus.`)) return;
+  try{ await deleteDoc(doc(fbDB, C_ELEVES, token)); toast('🗑️ Élève supprimé.'); }catch(e){ toast('❌ Erreur.'); }
+};
+
+/* ── Banque de quiz — Programme Terminale ── */
+const TERMINALE_SEED = [
+{ titre:"Compétition Maths — Terminale", matiere:"Mathématiques", dureeMin:20, questions:[
+  {q:"La dérivée de f(x) = x³ est :", options:["3x²","x²","3x","2x²"], correct:0, points:1},
+  {q:"lim (x→+∞) 1/x = ?", options:["+∞","0","1","-∞"], correct:1, points:1},
+  {q:"Une suite (Un) est dite arithmétique si :", options:["Un+1 − Un = constante","Un+1 / Un = constante","Un² = constante","Un est toujours positive"], correct:0, points:1},
+  {q:"ln(e) = ?", options:["0","1","e","-1"], correct:1, points:1},
+  {q:"Une primitive de f(x) = 2x est :", options:["x² + C","x²/2 + C","2x² + C","x + C"], correct:0, points:1},
+  {q:"Le discriminant de ax² + bx + c est :", options:["b² − 4ac","b² + 4ac","4ac − b²","a² − 4bc"], correct:0, points:1},
+  {q:"cos(0) = ?", options:["1","0","-1","non défini"], correct:0, points:1},
+  {q:"Une probabilité est toujours comprise entre :", options:["0 et 1","-1 et 1","0 et 100","1 et 10"], correct:0, points:1}
+]},
+{ titre:"Compétition Physique — Terminale", matiere:"Physique", dureeMin:20, questions:[
+  {q:"L'unité de la force dans le système international est :", options:["Newton","Joule","Watt","Pascal"], correct:0, points:1},
+  {q:"La vitesse de la lumière dans le vide est environ :", options:["300 000 km/s","300 km/s","3 000 km/s","30 000 km/s"], correct:0, points:1},
+  {q:"La loi d'Ohm s'écrit :", options:["U = R × I","U = R / I","U = I / R","U = R + I"], correct:0, points:1},
+  {q:"L'énergie cinétique d'un objet dépend de :", options:["sa masse et sa vitesse","sa couleur","sa température","son volume"], correct:0, points:1},
+  {q:"La fréquence est l'inverse de :", options:["la période","l'amplitude","la longueur d'onde","la vitesse"], correct:0, points:1},
+  {q:"Le principe d'inertie stipule qu'un corps isolé :", options:["reste au repos ou en mouvement rectiligne uniforme","accélère toujours","ralentit toujours","tourne sur lui-même"], correct:0, points:1},
+  {q:"L'unité de la puissance électrique est :", options:["Watt","Newton","Volt","Ampère"], correct:0, points:1},
+  {q:"Un condensateur stocke principalement :", options:["de l'énergie électrique","de la chaleur","du son","de la lumière"], correct:0, points:1}
+]},
+{ titre:"Compétition Chimie — Terminale", matiere:"Chimie", dureeMin:20, questions:[
+  {q:"Le pH d'une solution neutre est :", options:["7","0","14","1"], correct:0, points:1},
+  {q:"Une réaction d'oxydoréduction implique :", options:["un transfert d'électrons","un transfert de protons","un changement de couleur uniquement","rien de spécial"], correct:0, points:1},
+  {q:"La formule chimique de l'eau est :", options:["H2O","CO2","NaCl","O2"], correct:0, points:1},
+  {q:"Un acide fort en solution :", options:["se dissocie totalement","ne se dissocie jamais","change de couleur seul","est toujours coloré"], correct:0, points:1},
+  {q:"La mole est l'unité de :", options:["la quantité de matière","la masse","le volume","la température"], correct:0, points:1},
+  {q:"Le nombre d'Avogadro vaut environ :", options:["6,02 × 10²³","3,14","9,8","1 × 10¹⁰"], correct:0, points:1},
+  {q:"Une réaction exothermique :", options:["libère de la chaleur","absorbe de la chaleur","ne change rien","change de couleur"], correct:0, points:1},
+  {q:"Les alcanes sont des hydrocarbures :", options:["saturés","insaturés","aromatiques","acides"], correct:0, points:1}
+]},
+{ titre:"Compétition Français — Terminale", matiere:"Français", dureeMin:20, questions:[
+  {q:"Une métaphore est une figure de style qui :", options:["compare sans outil de comparaison","compare avec « comme »","répète un son","exagère une idée"], correct:0, points:1},
+  {q:"Victor Hugo est l'auteur de :", options:["Les Misérables","Madame Bovary","L'Étranger","Candide"], correct:0, points:1},
+  {q:"Un alexandrin est un vers de :", options:["12 syllabes","10 syllabes","8 syllabes","14 syllabes"], correct:0, points:1},
+  {q:"Le registre pathétique cherche à :", options:["susciter la pitié","faire rire","informer","convaincre par la logique"], correct:0, points:1},
+  {q:"Une antithèse oppose :", options:["deux idées contraires","deux mots identiques","deux rimes","deux personnages"], correct:0, points:1},
+  {q:"« Candide » est une œuvre de :", options:["Voltaire","Molière","Racine","Zola"], correct:0, points:1},
+  {q:"Le mouvement littéraire centré sur l'observation objective du réel est :", options:["le réalisme","le romantisme","le classicisme","le surréalisme"], correct:0, points:1},
+  {q:"Une hyperbole sert à :", options:["exagérer pour insister","atténuer une idée","comparer deux choses","poser une question"], correct:0, points:1}
+]},
+{ titre:"Compétition Anglais — Terminale", matiere:"Anglais", dureeMin:20, questions:[
+  {q:"Choose the correct form: \"She ___ to school every day.\"", options:["goes","go","going","gone"], correct:0, points:1},
+  {q:"What is the past tense of \"go\"?", options:["went","goed","gone","going"], correct:0, points:1},
+  {q:"\"Although\" introduces a clause of:", options:["contrast","cause","time","condition"], correct:0, points:1},
+  {q:"Choose the correct comparative: \"This book is ___ than that one.\"", options:["more interesting","interestinger","most interesting","interesting"], correct:0, points:1},
+  {q:"\"If I ___ rich, I would travel the world.\"", options:["were","was","am","be"], correct:0, points:1},
+  {q:"Passive voice of \"They built the house\" is:", options:["The house was built by them","The house is building","They was built","The house built them"], correct:0, points:1},
+  {q:"\"Neither of the students ___ present.\"", options:["is","are","were","be"], correct:0, points:1},
+  {q:"A synonym of \"important\" is:", options:["crucial","small","late","weak"], correct:0, points:1}
+]},
+{ titre:"Compétition Biologie — Terminale", matiere:"Biologie", dureeMin:20, questions:[
+  {q:"La molécule qui porte l'information génétique est :", options:["l'ADN","l'ARN seul","les protéines","les lipides"], correct:0, points:1},
+  {q:"La mitose produit :", options:["deux cellules filles identiques","quatre cellules différentes","une seule cellule","des gamètes"], correct:0, points:1},
+  {q:"Les enzymes sont des :", options:["catalyseurs biologiques","hormones","vitamines","minéraux"], correct:0, points:1},
+  {q:"La photosynthèse se déroule principalement dans :", options:["les chloroplastes","les mitochondries","le noyau","le cytoplasme seul"], correct:0, points:1},
+  {q:"Le système immunitaire protège l'organisme contre :", options:["les agents pathogènes","uniquement les virus","la chaleur","la lumière"], correct:0, points:1},
+  {q:"Un gène est :", options:["une portion d'ADN codant une information","une cellule","un chromosome entier","une protéine"], correct:0, points:1},
+  {q:"La respiration cellulaire produit principalement :", options:["de l'ATP","du glucose","de la chlorophylle","de l'ADN"], correct:0, points:1},
+  {q:"Les allèles sont :", options:["des versions différentes d'un même gène","des chromosomes","des cellules","des protéines"], correct:0, points:1}
+]},
+{ titre:"Compétition Géologie — Terminale", matiere:"Géologie", dureeMin:20, questions:[
+  {q:"La théorie qui explique le déplacement des continents est :", options:["la tectonique des plaques","la gravitation","l'évolution","la thermodynamique"], correct:0, points:1},
+  {q:"Une roche magmatique se forme par :", options:["refroidissement du magma","dépôt de sédiments","métamorphisme seul","érosion seule"], correct:0, points:1},
+  {q:"Le noyau terrestre est principalement composé de :", options:["fer et nickel","silicium","eau","carbone"], correct:0, points:1},
+  {q:"Un séisme est mesuré à l'aide :", options:["d'un sismographe","d'un baromètre","d'un thermomètre","d'un altimètre"], correct:0, points:1},
+  {q:"Les roches sédimentaires se forment par :", options:["accumulation et compaction de sédiments","fusion du magma","pression et chaleur extrêmes seules","éruption volcanique"], correct:0, points:1},
+  {q:"La croûte terrestre océanique est plus ___ que la croûte continentale.", options:["fine","épaisse","lourde en volume","identique"], correct:0, points:1},
+  {q:"Un volcan se forme généralement :", options:["aux limites de plaques tectoniques","au centre des continents uniquement","dans les océans profonds uniquement","n'importe où au hasard"], correct:0, points:1},
+  {q:"Le cycle des roches inclut :", options:["roches magmatiques, sédimentaires et métamorphiques","uniquement les roches magmatiques","uniquement l'érosion","uniquement les volcans"], correct:0, points:1}
+]},
+{ titre:"Compétition Philosophie — Terminale", matiere:"Philosophie", dureeMin:20, questions:[
+  {q:"Selon Descartes, la méthode pour atteindre la vérité repose sur :", options:["le doute méthodique","la foi seule","l'expérience sensorielle seule","l'autorité"], correct:0, points:1},
+  {q:"La conscience est définie comme :", options:["la connaissance immédiate que l'esprit a de lui-même","l'absence de pensée","le sommeil","l'instinct"], correct:0, points:1},
+  {q:"Pour Kant, agir moralement c'est agir :", options:["par devoir","par intérêt","par peur","par habitude"], correct:0, points:1},
+  {q:"La liberté peut être définie comme :", options:["la capacité d'agir selon sa volonté","l'absence totale de règles","le hasard","l'obéissance"], correct:0, points:1},
+  {q:"Le relativisme culturel affirme que :", options:["les valeurs varient selon les cultures","il existe une seule vérité universelle","la morale est innée","la culture n'a pas d'influence"], correct:0, points:1},
+  {q:"Pour Platon, le monde sensible s'oppose au monde :", options:["des idées","matériel","des rêves","du travail"], correct:0, points:1},
+  {q:"L'éthique s'intéresse principalement :", options:["à ce qui est bien ou mal","aux mathématiques","à la physique","à l'histoire seule"], correct:0, points:1},
+  {q:"Le déterminisme soutient que :", options:["tout événement a une cause","rien n'a de cause","tout est aléatoire","la liberté est totale"], correct:0, points:1}
+]},
+{ titre:"Compétition Culture Générale — Terminale", matiere:"Culture Générale", dureeMin:20, questions:[
+  {q:"Quelle est la capitale de la Guinée ?", options:["Conakry","Kankan","Labé","Nzérékoré"], correct:0, points:1},
+  {q:"En quelle année la Guinée a-t-elle accédé à l'indépendance ?", options:["1958","1960","1962","1945"], correct:0, points:1},
+  {q:"Quel est le plus grand océan du monde ?", options:["L'océan Pacifique","L'océan Atlantique","L'océan Indien","L'océan Arctique"], correct:0, points:1},
+  {q:"L'Organisation des Nations Unies (ONU) a été fondée en :", options:["1945","1919","1955","1960"], correct:0, points:1},
+  {q:"Quel est le plus long fleuve d'Afrique ?", options:["Le Nil","Le Congo","Le Niger","Le Zambèze"], correct:0, points:1},
+  {q:"Combien de continents compte-t-on habituellement ?", options:["6","5","7","4"], correct:0, points:1},
+  {q:"Quelle est la langue officielle de la Guinée ?", options:["Le français","L'anglais","L'arabe","Le portugais"], correct:0, points:1},
+  {q:"Le siège de l'Union Africaine se trouve à :", options:["Addis-Abeba","Le Caire","Abuja","Dakar"], correct:0, points:1},
+  {q:"Quelle est la monnaie utilisée en Guinée ?", options:["Le franc guinéen","Le franc CFA","L'euro","Le dollar"], correct:0, points:1},
+  {q:"Le mont Everest se situe dans quelle chaîne de montagnes ?", options:["L'Himalaya","Les Alpes","Les Andes","L'Atlas"], correct:0, points:1}
+]},
+{ titre:"Compétition Maths Avancées — Terminale SM", matiere:"Mathématiques (SM)", filiere:"SM", dureeMin:20, questions:[
+  {q:"La primitive de f(x) = 1/x sur ]0;+∞[ est :", options:["ln(x) + C","1/x² + C","x·ln(x) + C","ln(x²) + C"], correct:0, points:1},
+  {q:"Un nombre complexe z = a + bi a pour module :", options:["√(a² + b²)","a + b","a² + b²","a − b"], correct:0, points:1},
+  {q:"La limite de (1 + 1/n)ⁿ quand n → +∞ est :", options:["e","1","0","+∞ (non défini)"], correct:0, points:1},
+  {q:"Une matrice carrée est inversible si son déterminant est :", options:["non nul","nul","négatif","toujours égal à 1"], correct:0, points:1},
+  {q:"L'intégrale de 2x entre 0 et 3 vaut :", options:["9","6","3","12"], correct:0, points:1},
+  {q:"Pour une loi binomiale B(n,p), l'espérance est :", options:["n × p","n + p","n / p","p / n"], correct:0, points:1},
+  {q:"i² est égal à :", options:["-1","1","0","i"], correct:0, points:1}
+]},
+{ titre:"Compétition SVT Approfondie — Terminale SE", matiere:"SVT (SE)", filiere:"SE", dureeMin:20, questions:[
+  {q:"L'ADN polymérase intervient dans :", options:["la réplication de l'ADN","la digestion des protéines","la respiration cellulaire","la photosynthèse"], correct:0, points:1},
+  {q:"Le brassage interchromosomique se produit lors de :", options:["l'anaphase I de méiose","la mitose","la fécondation seule","l'interphase"], correct:0, points:1},
+  {q:"Une mutation génétique est :", options:["une modification de la séquence d'ADN","toujours visible physiquement","toujours mortelle","impossible à transmettre"], correct:0, points:1},
+  {q:"Le rôle des anticorps est de :", options:["neutraliser les antigènes","produire de l'énergie","transporter l'oxygène","digérer les graisses"], correct:0, points:1},
+  {q:"La sélection naturelle favorise les individus :", options:["les mieux adaptés à leur environnement","les plus grands uniquement","les plus rares","au hasard total"], correct:0, points:1},
+  {q:"Le phénotype d'un individu résulte de :", options:["l'interaction entre génotype et environnement","uniquement du génotype","uniquement de l'environnement","du hasard seul"], correct:0, points:1},
+  {q:"La biodiversité désigne :", options:["la diversité du vivant à tous les niveaux","seulement le nombre d'espèces animales","seulement les plantes","seulement les gènes"], correct:0, points:1}
+]}
+];
+
+function nextTourKey(key){
+  const idx = TOURS.findIndex(t=>t.key===key);
+  if(idx<0 || idx===TOURS.length-1) return null;
+  return TOURS[idx+1].key;
+}
+
+/* ── Banque de quiz — 16èmes de finale (Collège) ── */
+const COLLEGE_16E_SEED = [
+{ titre:"16e de finale — Mathématiques Collège", matiere:"Mathématiques", dureeMin:15, questions:[
+  {q:"Combien font 7 × 8 ?", options:["56","54","64","48"], correct:0, points:1},
+  {q:"Le périmètre d'un carré de côté 5 cm est :", options:["20 cm","25 cm","10 cm","15 cm"], correct:0, points:1},
+  {q:"Un nombre pair se termine toujours par :", options:["0, 2, 4, 6 ou 8","1, 3, 5, 7 ou 9","seulement 0","seulement 2"], correct:0, points:1},
+  {q:"3/4 en pourcentage égale :", options:["75%","34%","43%","25%"], correct:0, points:1},
+  {q:"La somme des angles d'un triangle vaut :", options:["180°","90°","360°","270°"], correct:0, points:1},
+  {q:"Le double de 15 est :", options:["30","25","45","20"], correct:0, points:1}
+]},
+{ titre:"16e de finale — Français Collège", matiere:"Français", dureeMin:15, questions:[
+  {q:"Le pluriel de « cheval » est :", options:["chevaux","chevals","chevaus","chevales"], correct:0, points:1},
+  {q:"Un verbe à l'infinitif se termine par :", options:["-er, -ir ou -re","toujours -é","toujours -ant","toujours -s"], correct:0, points:1},
+  {q:"« Rapide » est un :", options:["adjectif","verbe","adverbe","nom"], correct:0, points:1},
+  {q:"Le contraire de « grand » est :", options:["petit","court","large","haut"], correct:0, points:1},
+  {q:"Une phrase interrogative se termine par :", options:["un point d'interrogation","un point","une virgule","des points de suspension"], correct:0, points:1},
+  {q:"Dans « Ils mangent », le sujet est :", options:["ils","mangent","le verbe","aucun"], correct:0, points:1}
+]},
+{ titre:"16e de finale — Anglais Collège", matiere:"Anglais", dureeMin:15, questions:[
+  {q:"How do you say « bonjour » in English?", options:["Hello","Goodbye","Thanks","Please"], correct:0, points:1},
+  {q:"Choose the correct plural of « child »:", options:["children","childs","childrens","childes"], correct:0, points:1},
+  {q:"« I ___ a student. »", options:["am","is","are","be"], correct:0, points:1},
+  {q:"The opposite of « big » is:", options:["small","tall","fast","new"], correct:0, points:1},
+  {q:"« Cat » in French is:", options:["chat","chien","oiseau","poisson"], correct:0, points:1},
+  {q:"« What is your name? » is used to ask about:", options:["someone's name","the weather","the time","a place"], correct:0, points:1}
+]},
+{ titre:"16e de finale — Sciences Collège", matiere:"Sciences (SVT/Physique-Chimie)", dureeMin:15, questions:[
+  {q:"L'eau bout à quelle température (au niveau de la mer) ?", options:["100°C","50°C","0°C","150°C"], correct:0, points:1},
+  {q:"Le corps humain a combien de poumons ?", options:["2","1","3","4"], correct:0, points:1},
+  {q:"Le Soleil est :", options:["une étoile","une planète","un satellite","une comète"], correct:0, points:1},
+  {q:"L'air est composé principalement de :", options:["azote et oxygène","hydrogène seul","carbone seul","eau seule"], correct:0, points:1},
+  {q:"Une plante a besoin de lumière pour :", options:["faire la photosynthèse","dormir","respirer seulement la nuit","grandir sans eau"], correct:0, points:1},
+  {q:"Le cœur sert à :", options:["pomper le sang","digérer les aliments","filtrer l'air","penser"], correct:0, points:1}
+]},
+{ titre:"16e de finale — Culture Générale Collège", matiere:"Culture Générale", dureeMin:15, questions:[
+  {q:"Quelle est la capitale de la Guinée ?", options:["Conakry","Kankan","Labé","Nzérékoré"], correct:0, points:1},
+  {q:"Combien de jours compte une année (hors année bissextile) ?", options:["365","360","366","300"], correct:0, points:1},
+  {q:"Quel est le plus grand animal terrestre ?", options:["L'éléphant","Le lion","La girafe","Le rhinocéros"], correct:0, points:1},
+  {q:"La Guinée se trouve sur quel continent ?", options:["L'Afrique","L'Asie","L'Europe","L'Amérique"], correct:0, points:1},
+  {q:"Combien de continents compte-t-on habituellement ?", options:["6","4","5","7"], correct:0, points:1},
+  {q:"Quel jour vient après lundi ?", options:["Mardi","Mercredi","Dimanche","Jeudi"], correct:0, points:1}
+]}
+];
+
+/* ── Banque de quiz — 8èmes de finale (Collège) ── */
+const COLLEGE_8E_SEED = [
+{ titre:"8e de finale — Mathématiques Collège", matiere:"Mathématiques", dureeMin:15, questions:[
+  {q:"Résous : 2x + 3 = 11. x = ?", options:["4","3","5","8"], correct:0, points:1},
+  {q:"L'aire d'un rectangle de longueur 8 cm et largeur 3 cm est :", options:["24 cm²","11 cm²","22 cm²","16 cm²"], correct:0, points:1},
+  {q:"√81 = ?", options:["9","8","7","6"], correct:0, points:1},
+  {q:"20% de 200 est :", options:["40","20","4","400"], correct:0, points:1},
+  {q:"Un triangle isocèle a :", options:["deux côtés égaux","trois côtés égaux","aucun côté égal","quatre côtés"], correct:0, points:1},
+  {q:"La médiane d'une série de nombres triée est :", options:["la valeur du milieu","la plus grande valeur","la moyenne","la plus petite valeur"], correct:0, points:1}
+]},
+{ titre:"8e de finale — Français Collège", matiere:"Français", dureeMin:15, questions:[
+  {q:"Le complément d'objet direct répond à la question :", options:["qui ? / quoi ?","où ?","quand ?","comment ?"], correct:0, points:1},
+  {q:"« Bien que » introduit une proposition de :", options:["concession","cause","conséquence","but"], correct:0, points:1},
+  {q:"Un synonyme de « content » est :", options:["heureux","triste","fâché","fatigué"], correct:0, points:1},
+  {q:"Le passé composé de « je vais » est :", options:["je suis allé","j'irai","j'allais","je vais aller"], correct:0, points:1},
+  {q:"Une comparaison utilise souvent le mot :", options:["comme","et","donc","mais"], correct:0, points:1},
+  {q:"Molière est célèbre pour :", options:["ses comédies","ses romans policiers","ses poèmes d'amour uniquement","ses essais scientifiques"], correct:0, points:1}
+]},
+{ titre:"8e de finale — Anglais Collège", matiere:"Anglais", dureeMin:15, questions:[
+  {q:"« She has ___ finished her homework. »", options:["already","yet","still","ago"], correct:0, points:1},
+  {q:"Choose the correct question tag: « You like tea, ___? »", options:["don't you","doesn't you","aren't you","isn't it"], correct:0, points:1},
+  {q:"The past participle of « write » is:", options:["written","wrote","writed","writing"], correct:0, points:1},
+  {q:"« Neither ... ___ » is the correct pair:", options:["nor","or","and","but"], correct:0, points:1},
+  {q:"A word meaning « difficult » is:", options:["hard","easy","simple","fast"], correct:0, points:1},
+  {q:"« They ___ to the market yesterday. »", options:["went","go","goes","going"], correct:0, points:1}
+]},
+{ titre:"8e de finale — Histoire-Géographie Collège", matiere:"Histoire-Géographie", dureeMin:15, questions:[
+  {q:"La Guinée a obtenu son indépendance en :", options:["1958","1960","1962","1945"], correct:0, points:1},
+  {q:"Le fleuve Niger prend sa source en :", options:["Guinée","Mali","Nigeria","Sénégal"], correct:0, points:1},
+  {q:"Le premier président de la Guinée fut :", options:["Ahmed Sékou Touré","Lansana Conté","Alpha Condé","Sékou Traoré"], correct:0, points:1},
+  {q:"Un désert est une région caractérisée par :", options:["un climat très sec","beaucoup de pluie","beaucoup de neige","une forêt dense"], correct:0, points:1},
+  {q:"La Deuxième Guerre mondiale s'est terminée en :", options:["1945","1939","1918","1950"], correct:0, points:1},
+  {q:"La capitale du Mali est :", options:["Bamako","Dakar","Abidjan","Accra"], correct:0, points:1}
+]},
+{ titre:"8e de finale — Culture Générale Collège", matiere:"Culture Générale", dureeMin:15, questions:[
+  {q:"Quel est le plus long fleuve d'Afrique ?", options:["Le Nil","Le Niger","Le Congo","Le Zambèze"], correct:0, points:1},
+  {q:"L'ONU a été fondée en :", options:["1945","1919","1960","1955"], correct:0, points:1},
+  {q:"La monnaie de la Guinée est :", options:["Le franc guinéen","Le franc CFA","L'euro","Le dollar"], correct:0, points:1},
+  {q:"Combien de joueurs compte une équipe de football sur le terrain ?", options:["11","10","9","12"], correct:0, points:1},
+  {q:"Quel organe filtre principalement le sang pour produire l'urine ?", options:["Le rein","Le cœur","Le foie","Le poumon"], correct:0, points:1},
+  {q:"Le siège de l'Union Africaine est à :", options:["Addis-Abeba","Le Caire","Dakar","Abuja"], correct:0, points:1}
+]}
+];
+
+/* ── Banque de quiz — 4e de finale (Lycée Seconde) ── */
+const SECONDE_4E_SEED = [
+{ titre:"4e de finale — Mathématiques Seconde", matiere:"Mathématiques", dureeMin:18, questions:[
+  {q:"Le produit (a+b)² est égal à :", options:["a² + 2ab + b²","a² + b²","a² − 2ab + b²","2a + 2b"], correct:0, points:1},
+  {q:"La forme canonique de f(x) = x² − 4x + 3 fait apparaître :", options:["(x−2)² − 1","(x−2)² + 1","(x+2)² − 1","(x−1)² − 2"], correct:0, points:1},
+  {q:"Un vecteur nul a pour norme :", options:["0","1","-1","indéfinie"], correct:0, points:1},
+  {q:"La fonction f(x) = 1/x est définie sur :", options:["ℝ*","ℝ","ℝ+","ℝ-"], correct:0, points:1},
+  {q:"sin²(x) + cos²(x) = ?", options:["1","0","2","x"], correct:0, points:1},
+  {q:"Le coefficient directeur d'une droite mesure :", options:["sa pente","sa longueur","son ordonnée à l'origine","son aire"], correct:0, points:1}
+]},
+{ titre:"4e de finale — Physique-Chimie Seconde", matiere:"Physique-Chimie", dureeMin:18, questions:[
+  {q:"L'unité de mesure de l'énergie est :", options:["le Joule","le Newton","le Watt","le Volt"], correct:0, points:1},
+  {q:"La masse volumique se calcule par :", options:["masse / volume","volume / masse","masse × volume","masse + volume"], correct:0, points:1},
+  {q:"Un mélange homogène a :", options:["une seule phase visible","plusieurs phases visibles","toujours une couleur","toujours un solide"], correct:0, points:1},
+  {q:"La combustion du carbone produit principalement :", options:["du dioxyde de carbone","de l'oxygène","de l'azote","de l'hydrogène"], correct:0, points:1},
+  {q:"La tension électrique se mesure avec :", options:["un voltmètre","un ampèremètre","un thermomètre","un baromètre"], correct:0, points:1},
+  {q:"Le sel de cuisine a pour formule :", options:["NaCl","H2O","CO2","NaOH"], correct:0, points:1}
+]},
+{ titre:"4e de finale — SVT Seconde", matiere:"SVT", dureeMin:18, questions:[
+  {q:"La cellule est l'unité de base :", options:["du vivant","de la matière inerte seulement","des roches","de l'atmosphère"], correct:0, points:1},
+  {q:"Le sang est transporté dans l'organisme par :", options:["les vaisseaux sanguins","les nerfs","les os","les muscles seuls"], correct:0, points:1},
+  {q:"La photosynthèse produit :", options:["du glucose et de l'oxygène","du CO2 seulement","de l'eau seulement","de l'azote"], correct:0, points:1},
+  {q:"Un écosystème comprend :", options:["les êtres vivants et leur milieu","seulement les animaux","seulement les plantes","seulement le sol"], correct:0, points:1},
+  {q:"Le système nerveux est contrôlé principalement par :", options:["le cerveau","le cœur","le foie","les poumons"], correct:0, points:1},
+  {q:"La reproduction sexuée nécessite :", options:["deux parents","un seul parent","aucune fécondation","toujours une graine"], correct:0, points:1}
+]},
+{ titre:"4e de finale — Français Seconde", matiere:"Français", dureeMin:18, questions:[
+  {q:"Le mouvement littéraire du XIXe siècle centré sur les sentiments est :", options:["le romantisme","le classicisme","le réalisme","le naturalisme"], correct:0, points:1},
+  {q:"« Zola » est associé au mouvement :", options:["naturaliste","romantique","surréaliste","baroque"], correct:0, points:1},
+  {q:"Le narrateur omniscient :", options:["connaît tout des personnages","ne connaît que ses propres pensées","est absent du récit","parle toujours à la première personne"], correct:0, points:1},
+  {q:"Un sonnet comporte généralement :", options:["14 vers","12 vers","10 vers","16 vers"], correct:0, points:1},
+  {q:"L'ellipse narrative consiste à :", options:["passer sous silence une partie du temps","décrire longuement","répéter un événement","ajouter des personnages"], correct:0, points:1},
+  {q:"Une antithèse oppose :", options:["deux idées contraires","deux mots identiques","deux rimes","deux personnages"], correct:0, points:1}
+]},
+{ titre:"4e de finale — Anglais Seconde", matiere:"Anglais", dureeMin:18, questions:[
+  {q:"Choose correct: « By next year, I ___ my studies. »", options:["will have finished","will finish","finished","have finished"], correct:0, points:1},
+  {q:"« Despite ___ tired, she kept working. »", options:["being","be","been","to be"], correct:0, points:1},
+  {q:"A synonym for « essential » is:", options:["crucial","optional","minor","rare"], correct:0, points:1},
+  {q:"Choose correct reported speech: He said he ___ tired.", options:["was","is","were","be"], correct:0, points:1},
+  {q:"« Used to » expresses:", options:["a past habit","a future plan","a present fact","an order"], correct:0, points:1},
+  {q:"The passive of « She wrote a letter » is:", options:["A letter was written by her","A letter is written","She was written a letter","A letter wrote her"], correct:0, points:1}
+]},
+{ titre:"4e de finale — Culture Générale Seconde", matiere:"Culture Générale", dureeMin:18, questions:[
+  {q:"Quel pays a inventé le football moderne ?", options:["L'Angleterre","La France","L'Italie","Le Brésil"], correct:0, points:1},
+  {q:"La Guinée compte combien de régions naturelles principales ?", options:["4","3","5","2"], correct:0, points:1},
+  {q:"Quelle est la plus haute montagne du monde ?", options:["L'Everest","Le Kilimandjaro","Le Mont Blanc","Le Mont Nimba"], correct:0, points:1},
+  {q:"L'Union Africaine compte environ combien d'États membres ?", options:["55","30","70","100"], correct:0, points:1},
+  {q:"Quel est le plus petit pays du monde ?", options:["Le Vatican","Monaco","Malte","Andorre"], correct:0, points:1},
+  {q:"Le drapeau de la Guinée est composé des couleurs :", options:["rouge, jaune, vert","bleu, blanc, rouge","vert, blanc, rouge","noir, jaune, rouge"], correct:0, points:1}
+]}
+];
+
+/* ── Banque de quiz — Demi-finale (Lycée Première) ── */
+const PREMIERE_DEMI_SEED = [
+{ titre:"Demi-finale — Mathématiques Première", matiere:"Mathématiques", dureeMin:20, questions:[
+  {q:"La dérivée de f(x) = x² est :", options:["2x","x","2","x²"], correct:0, points:1},
+  {q:"Le vecteur directeur d'une droite d'équation y = 2x+1 est :", options:["(1;2)","(2;1)","(1;-2)","(-1;2)"], correct:0, points:1},
+  {q:"Deux événements A et B sont indépendants si :", options:["P(A∩B) = P(A)×P(B)","P(A∩B) = P(A)+P(B)","P(A) = P(B)","A∩B = ∅ toujours"], correct:0, points:1},
+  {q:"Une suite géométrique a une raison :", options:["constante multiplicative","constante additive","toujours égale à 1","toujours nulle"], correct:0, points:1},
+  {q:"Le produit scalaire de deux vecteurs orthogonaux vaut :", options:["0","1","-1","leur norme"], correct:0, points:1},
+  {q:"La fonction exponentielle est toujours :", options:["strictement positive","négative","nulle en 0","décroissante"], correct:0, points:1}
+]},
+{ titre:"Demi-finale — Physique-Chimie Première", matiere:"Physique-Chimie", dureeMin:20, questions:[
+  {q:"La deuxième loi de Newton s'écrit :", options:["F = m × a","F = m / a","F = m + a","F = a / m"], correct:0, points:1},
+  {q:"Un acide et une base réagissent pour former :", options:["un sel et de l'eau","seulement de l'eau","un gaz toxique toujours","rien"], correct:0, points:1},
+  {q:"La fréquence d'une onde se mesure en :", options:["Hertz","Newton","Joule","Volt"], correct:0, points:1},
+  {q:"L'énergie mécanique est la somme de :", options:["l'énergie cinétique et potentielle","la masse et la vitesse","la chaleur et la lumière","la pression et le volume"], correct:0, points:1},
+  {q:"Une pile électrochimique transforme :", options:["l'énergie chimique en énergie électrique","l'énergie électrique en chimique uniquement","la lumière en chaleur","le son en électricité"], correct:0, points:1},
+  {q:"Le pH d'une base est :", options:["supérieur à 7","inférieur à 7","toujours égal à 7","négatif"], correct:0, points:1}
+]},
+{ titre:"Demi-finale — SVT Première", matiere:"SVT", dureeMin:20, questions:[
+  {q:"La méiose produit des cellules :", options:["à n chromosomes (gamètes)","identiques à la cellule mère","toujours cancéreuses","sans noyau"], correct:0, points:1},
+  {q:"L'ADN se trouve principalement dans :", options:["le noyau de la cellule","le cytoplasme uniquement","la membrane cellulaire","les ribosomes uniquement"], correct:0, points:1},
+  {q:"Le brassage génétique intervient lors de :", options:["la méiose et la fécondation","la mitose uniquement","la respiration","la digestion"], correct:0, points:1},
+  {q:"Un neurone transmet l'information sous forme :", options:["d'influx nerveux","de sang","d'hormones uniquement","de chaleur"], correct:0, points:1},
+  {q:"L'hérédité est étudiée par la science appelée :", options:["la génétique","la géologie","l'écologie","la physiologie"], correct:0, points:1},
+  {q:"Le système endocrinien agit par le biais :", options:["des hormones","des nerfs uniquement","des muscles","des os"], correct:0, points:1}
+]},
+{ titre:"Demi-finale — Philosophie Première", matiere:"Philosophie", dureeMin:20, questions:[
+  {q:"La philosophie interroge avant tout :", options:["le sens et les fondements des choses","les résultats expérimentaux uniquement","les chiffres","les dates historiques"], correct:0, points:1},
+  {q:"Un syllogisme est :", options:["un raisonnement logique en trois propositions","une figure de style","une expérience scientifique","un poème"], correct:0, points:1},
+  {q:"Socrate est connu pour sa méthode appelée :", options:["la maïeutique","le scepticisme","le stoïcisme","l'empirisme"], correct:0, points:1},
+  {q:"La raison s'oppose souvent, chez les philosophes, à :", options:["la passion","la logique","la science","le langage"], correct:0, points:1},
+  {q:"Le doute cartésien vise à :", options:["atteindre une certitude fondamentale","tout rejeter définitivement","prouver l'existence de Dieu seul","nier la réalité"], correct:0, points:1},
+  {q:"L'éthique de la responsabilité concerne :", options:["les conséquences de nos actes","uniquement nos intentions","le hasard","la chance"], correct:0, points:1}
+]},
+{ titre:"Demi-finale — Anglais Première", matiere:"Anglais", dureeMin:20, questions:[
+  {q:"« I wish I ___ more time. »", options:["had","have","has","having"], correct:0, points:1},
+  {q:"Choose the modal expressing obligation:", options:["must","might","could","would"], correct:0, points:1},
+  {q:"« Hardly had she arrived ___ it started raining. »", options:["when","than","then","that"], correct:0, points:1},
+  {q:"A word meaning « to postpone » is:", options:["to delay","to hurry","to finish","to start"], correct:0, points:1},
+  {q:"Choose correct conditional: « If it rains, we ___ stay home. »", options:["will","would","would have","had"], correct:0, points:1},
+  {q:"The antonym of « generous » is:", options:["stingy","kind","wealthy","polite"], correct:0, points:1}
+]},
+{ titre:"Demi-finale — Culture Générale Première", matiere:"Culture Générale", dureeMin:20, questions:[
+  {q:"Le siège des Nations Unies se trouve à :", options:["New York","Genève","Paris","Bruxelles"], correct:0, points:1},
+  {q:"La Guinée est surnommée :", options:["le château d'eau de l'Afrique de l'Ouest","le poumon vert de l'Afrique","le grenier de l'Afrique","la perle de l'Afrique"], correct:0, points:1},
+  {q:"Le fondateur de la théorie de la relativité est :", options:["Albert Einstein","Isaac Newton","Galilée","Charles Darwin"], correct:0, points:1},
+  {q:"Combien de pays composaient la CEDEAO à sa création ?", options:["15","10","20","12"], correct:0, points:1},
+  {q:"Le désert du Sahara se situe principalement en :", options:["Afrique du Nord","Afrique australe","Afrique de l'Est","Amérique du Sud"], correct:0, points:1},
+  {q:"L'auteur de la théorie de l'évolution des espèces est :", options:["Charles Darwin","Isaac Newton","Louis Pasteur","Albert Einstein"], correct:0, points:1}
+]}
+];
+
+window.seedTerminaleQuiz = async function(){
+  if(!confirm("Créer les 11 quiz du tour Finale (9 matières communes + Maths SM + SVT SE) ? Ils seront actifs immédiatement (visibles seulement quand le tour Finale sera activé, et seulement pour les élèves qualifiés).")) return;
+  const existingTitres = new Set((window._quizCache||[]).map(q=>q.titre));
+  let created=0, skipped=0;
+  for(const s of TERMINALE_SEED){
+    if(existingTitres.has(s.titre)){ skipped++; continue; }
+    try{
+      await addDoc(collection(fbDB, C_QUIZ), { titre:s.titre, matiere:s.matiere, classe:'', tour:'finale', filiere:s.filiere||'', dureeMin:s.dureeMin, questions:s.questions, actif:true, createdAt: Date.now() });
+      created++;
+    }catch(e){}
+  }
+  toast(`✅ ${created} quiz créé(s)${skipped?`, ${skipped} déjà existant(s)`:''}.`);
+};
+
+const TOUR_SEEDS = { '16e':COLLEGE_16E_SEED, '8e':COLLEGE_8E_SEED, '4e':SECONDE_4E_SEED, 'demi':PREMIERE_DEMI_SEED };
+window.seedTourQuiz = async function(tourKey){
+  const seed = TOUR_SEEDS[tourKey];
+  const info = tourInfo(tourKey);
+  if(!seed || !info) return;
+  if(!confirm(`Créer les ${seed.length} quiz du tour "${info.label}" (${info.niveau}) ? Ils seront actifs immédiatement (visibles seulement quand ce tour sera activé).`)) return;
+  const existingTitres = new Set((window._quizCache||[]).map(q=>q.titre));
+  let created=0, skipped=0;
+  for(const s of seed){
+    if(existingTitres.has(s.titre)){ skipped++; continue; }
+    try{
+      await addDoc(collection(fbDB, C_QUIZ), { titre:s.titre, matiere:s.matiere, classe:'', tour:tourKey, filiere:'', dureeMin:s.dureeMin, questions:s.questions, actif:true, createdAt: Date.now() });
+      created++;
+    }catch(e){}
+  }
+  toast(`✅ ${created} quiz créé(s)${skipped?`, ${skipped} déjà existant(s)`:''}.`);
+};
+
+/* ── Quiz ── */
+let unsubQuiz=null;
+let qEditId=null;
+let qBuilder=[];
+
+function renderAdminQuiz(){
+  const body = document.getElementById('tabBody');
+  body.innerHTML = `
+    <div class="card">
+      <div class="card-title">🏆 Tour actif de la compétition</div>
+      <div style="font-size:12.5px;color:#64748b;margin-bottom:8px">Seul ce tour est visible par les élèves (en plus du quiz activé individuellement). Changez-le pour faire progresser la compétition d'un tour à l'autre.</div>
+      <select id="tourActifSelect">${TOURS.map(t=>`<option value="${t.key}" ${t.key===currentTourActif?'selected':''}>${esc(t.label)} — ${esc(t.niveau)}</option>`).join('')}</select>
+      <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="setTourActif()">✅ Activer ce tour pour tous</button></div>
+    </div>
+    <div class="card">
+      <div class="card-title" id="qFormTitle">➕ Nouveau quiz</div>
+      <label class="f-label">Titre</label><input type="text" id="q-titre" placeholder="Ex : Compétition Maths — Chapitre 3">
+      <label class="f-label">Matière</label><input type="text" id="q-matiere" placeholder="Ex : Mathématiques">
+      <label class="f-label">Tour de la compétition</label>
+      <select id="q-tour">${TOURS.map(t=>`<option value="${t.key}">${esc(t.label)} — ${esc(t.niveau)}</option>`).join('')}</select>
+      <label class="f-label">Filière (Finale uniquement — laisser "Toutes" pour Culture Générale)</label>
+      <select id="q-filiere">
+        <option value="">Toutes / Culture Générale</option>
+        <option value="SM">SM uniquement</option>
+        <option value="SE">SE uniquement</option>
+      </select>
+      <label class="f-label">Classe ciblée (laisser vide = toutes les classes du tour)</label><input type="text" id="q-classe" placeholder="Ex : 3ème A">
+      <label class="f-label">Durée (minutes)</label><input type="number" id="q-duree" value="15" min="1">
+      <div id="qQuestionsBox"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="addQuestionBlock()">➕ Ajouter une question</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveQuiz()">💾 Enregistrer le quiz</button>
+        <button class="btn btn-ghost" id="qCancelBtn" onclick="resetQuizForm()" style="display:none">Annuler la modification</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🌱 Génération automatique des questionnaires</div>
+      <div style="font-size:12.5px;color:#64748b;margin-bottom:8px">Génère un jeu de quiz prêt à l'emploi pour chaque tour (5-6 matières, 6-8 questions chacune). Vous pourrez ensuite les modifier librement.</div>
+      <div class="btn-row" style="flex-wrap:wrap">
+        <button class="btn btn-dark btn-sm" onclick="seedTourQuiz('16e')">🌱 16èmes (Collège)</button>
+        <button class="btn btn-dark btn-sm" onclick="seedTourQuiz('8e')">🌱 8èmes (Collège)</button>
+        <button class="btn btn-dark btn-sm" onclick="seedTourQuiz('4e')">🌱 4e de finale (Seconde)</button>
+        <button class="btn btn-dark btn-sm" onclick="seedTourQuiz('demi')">🌱 Demi-finale (Première)</button>
+        <button class="btn btn-dark btn-sm" onclick="seedTerminaleQuiz()">🌱 Finale (Terminale + SM/SE)</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📝 Quiz créés</div>
+      <div id="quizList"><div class="spinner"></div></div>
+    </div>`;
+  qBuilder = []; qEditId = null;
+  addQuestionBlock();
+  const tourSel = document.getElementById('q-tour');
+  if(tourSel) tourSel.value = currentTourActif || '16e';
+  if(unsubQuiz) unsubQuiz();
+  unsubQuiz = onSnapshot(collection(fbDB, C_QUIZ), snap=>{
+    const list = snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    window._quizCache = list;
+    const el = document.getElementById('quizList');
+    if(!el) return;
+    if(!list.length){ el.innerHTML = '<div class="empty">Aucun quiz créé pour le moment.</div>'; return; }
+    el.innerHTML = list.map(q=>`
+      <div class="row">
+        <div class="main">
+          <div class="t1">${esc(q.titre)} <span class="chip ${q.actif?'chip-green':'chip-gray'}">${q.actif?'Actif':'Inactif'}</span> ${q.tour?`<span class="chip chip-indigo">${esc(tourInfo(q.tour)?tourInfo(q.tour).label:q.tour)}</span>`:''} ${q.filiere?`<span class="chip chip-indigo">${esc(q.filiere)}</span>`:''}</div>
+          <div class="t2">${esc(q.matiere||'—')} · ${esc(q.classe||'Toutes classes')} · ${q.questions.length} question(s) · ${q.dureeMin} min</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="toggleQuizActif('${q.id}', ${!q.actif})">${q.actif?'⏸️':'▶️'}</button>
+        <button class="btn btn-ghost btn-sm" onclick="editQuiz('${q.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteQuiz('${q.id}','${esc(q.titre).replace(/'/g,"\\'")}')">🗑️</button>
+      </div>`).join('');
+  });
+}
+
+window.setTourActif = async function(){
+  const sel = document.getElementById('tourActifSelect');
+  const val = sel && sel.value;
+  if(!val) return;
+  try{
+    await setDoc(doc(fbDB, C_CONFIG, 'etat'), { tourActif: val }, { merge:true });
+    toast('✅ Tour actif : '+tourLabel(val));
+  }catch(e){ toast('❌ Erreur : '+e.message); }
+};
+
+window.addQuestionBlock = function(prefill){
+  const idx = qBuilder.length;
+  qBuilder.push(prefill || { q:'', options:['','','',''], correct:0, points:1 });
+  renderQuestionsBox();
+};
+window.removeQuestionBlock = function(idx){ qBuilder.splice(idx,1); renderQuestionsBox(); };
+function renderQuestionsBox(){
+  const box = document.getElementById('qQuestionsBox');
+  if(!box) return;
+  box.innerHTML = qBuilder.map((qb,i)=>`
+    <div class="q-block">
+      <button class="q-remove" onclick="removeQuestionBlock(${i})">✕</button>
+      <div class="q-num">QUESTION ${i+1}</div>
+      <textarea placeholder="Énoncé de la question" data-role="qtext" data-i="${i}">${esc(qb.q)}</textarea>
+      ${[0,1,2,3].map(oi=>`
+        <div class="q-opt-row">
+          <input type="radio" name="correct-${i}" ${qb.correct===oi?'checked':''} data-role="qcorrect" data-i="${i}" data-oi="${oi}">
+          <input type="text" style="flex:1" placeholder="Réponse ${String.fromCharCode(65+oi)}" data-role="qopt" data-i="${i}" data-oi="${oi}" value="${esc(qb.options[oi])}">
+        </div>`).join('')}
+      <label class="f-label">Points</label>
+      <input type="number" min="1" value="${qb.points}" style="max-width:100px" data-role="qpoints" data-i="${i}">
+    </div>`).join('');
+  box.querySelectorAll('[data-role]').forEach(elm=>{
+    elm.addEventListener('input', e=>{
+      const i = +e.target.dataset.i;
+      if(e.target.dataset.role==='qtext') qBuilder[i].q = e.target.value;
+      else if(e.target.dataset.role==='qopt') qBuilder[i].options[+e.target.dataset.oi] = e.target.value;
+      else if(e.target.dataset.role==='qpoints') qBuilder[i].points = +e.target.value || 1;
+    });
+    elm.addEventListener('change', e=>{
+      if(e.target.dataset.role==='qcorrect') qBuilder[+e.target.dataset.i].correct = +e.target.dataset.oi;
+    });
+  });
+}
+
+window.saveQuiz = async function(){
+  const titre = document.getElementById('q-titre').value.trim();
+  const matiere = document.getElementById('q-matiere').value.trim();
+  const classe = document.getElementById('q-classe').value.trim();
+  const tour = document.getElementById('q-tour').value || '16e';
+  const filiere = document.getElementById('q-filiere').value.trim();
+  const dureeMin = +document.getElementById('q-duree').value || 15;
+  const questions = qBuilder.filter(q=>q.q.trim() && q.options.every(o=>o.trim()));
+  if(!titre){ toast('⚠️ Le titre est obligatoire.'); return; }
+  if(!questions.length){ toast('⚠️ Ajoutez au moins une question complète (énoncé + 4 réponses).'); return; }
+  const data = { titre, matiere, classe, tour, filiere, dureeMin, questions, actif: qEditId ? (window._quizCache.find(q=>q.id===qEditId)||{}).actif ?? false : false, createdAt: qEditId ? (window._quizCache.find(q=>q.id===qEditId)||{}).createdAt || Date.now() : Date.now() };
+  try{
+    if(qEditId){ await setDoc(doc(fbDB, C_QUIZ, qEditId), data); toast('✅ Quiz mis à jour.'); }
+    else { await addDoc(collection(fbDB, C_QUIZ), data); toast('✅ Quiz créé (inactif — activez-le quand vous êtes prêt).'); }
+  }catch(e){ toast('❌ Erreur : '+e.message); return; }
+  resetQuizForm();
+};
+window.resetQuizForm = function(){
+  qEditId=null; qBuilder=[];
+  document.getElementById('q-titre').value=''; document.getElementById('q-matiere').value='';
+  document.getElementById('q-classe').value=''; document.getElementById('q-duree').value=15;
+  document.getElementById('q-tour').value = currentTourActif || '16e';
+  document.getElementById('q-filiere').value='';
+  document.getElementById('qFormTitle').textContent='➕ Nouveau quiz';
+  document.getElementById('qCancelBtn').style.display='none';
+  addQuestionBlock();
+};
+window.editQuiz = function(id){
+  const q = (window._quizCache||[]).find(x=>x.id===id);
+  if(!q) return;
+  qEditId = id;
+  document.getElementById('q-titre').value = q.titre;
+  document.getElementById('q-matiere').value = q.matiere||'';
+  document.getElementById('q-classe').value = q.classe||'';
+  document.getElementById('q-tour').value = q.tour||'16e';
+  document.getElementById('q-filiere').value = q.filiere||'';
+  document.getElementById('q-duree').value = q.dureeMin;
+  document.getElementById('qFormTitle').textContent = '✏️ Modifier le quiz';
+  document.getElementById('qCancelBtn').style.display='inline-flex';
+  qBuilder = q.questions.map(x=>({ q:x.q, options:[...x.options], correct:x.correct, points:x.points||1 }));
+  renderQuestionsBox();
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+window.toggleQuizActif = async function(id, val){
+  try{ await updateDoc(doc(fbDB, C_QUIZ, id), { actif: val }); toast(val?'▶️ Quiz activé.':'⏸️ Quiz désactivé.'); }catch(e){ toast('❌ Erreur.'); }
+};
+window.deleteQuiz = async function(id, titre){
+  if(!confirm(`Supprimer le quiz "${titre}" ? Les résultats déjà enregistrés seront conservés mais orphelins.`)) return;
+  try{ await deleteDoc(doc(fbDB, C_QUIZ, id)); toast('🗑️ Quiz supprimé.'); }catch(e){ toast('❌ Erreur.'); }
+};
+
+/* ── Classement (admin) ── */
+let unsubResAdmin=null;
+function renderAdminClassement(){
+  const body = document.getElementById('tabBody');
+  const quizzes = window._quizCache || [];
+  const qualifiableTours = TOURS.slice(0, -1); // tous sauf la Finale (pas de tour suivant)
+  body.innerHTML = `
+    <div class="card">
+      <div class="card-title">🎯 Qualification pour le tour suivant</div>
+      <div style="font-size:12.5px;color:#64748b;margin-bottom:8px">Calcule le classement des résultats d'un tour (somme des scores de tous les quiz de ce tour) et qualifie automatiquement les meilleur(e)s pour le tour suivant. Cette action remplace les qualifications déjà enregistrées pour ce tour suivant.</div>
+      <label class="f-label">Tour à clôturer</label>
+      <select id="qualTourSelect">${qualifiableTours.map(t=>`<option value="${t.key}">${esc(t.label)} — ${esc(t.niveau)}</option>`).join('')}</select>
+      <label class="f-label">Nombre de qualifiés pour le tour suivant</label>
+      <input type="number" id="qualNombre" value="16" min="1">
+      <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="calculerQualification()">🏁 Calculer et qualifier</button></div>
+      <div id="qualResultBox" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏅 Classement par quiz</div>
+      <select id="lbQuizSelect"><option value="">— Choisir un quiz —</option>${quizzes.map(q=>`<option value="${q.id}">${esc(q.titre)}</option>`).join('')}</select>
+      <div id="lbQuizBox" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🌍 Classement général (tous quiz confondus)</div>
+      <div id="lbGlobalBox"><div class="spinner"></div></div>
+    </div>`;
+  document.getElementById('lbQuizSelect').onchange = e=>renderLbForQuiz(e.target.value);
+  if(unsubResAdmin) unsubResAdmin();
+  unsubResAdmin = onSnapshot(collection(fbDB, C_RESULT), snap=>{
+    window._resultsCache = snap.docs.map(d=>d.data());
+    renderLbGlobal();
+    const sel = document.getElementById('lbQuizSelect');
+    if(sel && sel.value) renderLbForQuiz(sel.value);
+  });
+}
+window.calculerQualification = async function(){
+  const tourSel = document.getElementById('qualTourSelect');
+  const nombreEl = document.getElementById('qualNombre');
+  if(!tourSel || !nombreEl) return;
+  const tourKey = tourSel.value;
+  const n = Math.max(1, +nombreEl.value || 0);
+  const next = nextTourKey(tourKey);
+  const infoTour = tourInfo(tourKey), infoNext = tourInfo(next);
+  if(!next || !infoNext){ toast('⚠️ Aucun tour suivant pour ce tour.'); return; }
+  if(!confirm(`Qualifier les ${n} meilleur(e)s du tour "${infoTour.label}" pour le tour "${infoNext.label}" ? Les qualifications déjà enregistrées pour "${infoNext.label}" seront remplacées.`)) return;
+
+  const box = document.getElementById('qualResultBox');
+  if(box) box.innerHTML = '<div class="spinner"></div>';
+
+  try{
+    const results = (window._resultsCache||[]).filter(r=>r.tour===tourKey);
+    const byToken = {};
+    results.forEach(r=>{
+      if(!byToken[r.token]) byToken[r.token] = { nom:r.nom, classe:r.classe, totalScore:0, totalMax:0, nbQuiz:0 };
+      byToken[r.token].totalScore += r.score;
+      byToken[r.token].totalMax += r.total;
+      byToken[r.token].nbQuiz += 1;
+    });
+    const ranked = Object.entries(byToken).map(([token,v])=>({
+      token, ...v, pct: v.totalMax ? (v.totalScore/v.totalMax*100) : 0
+    })).sort((a,b)=> b.pct - a.pct || b.totalScore - a.totalScore);
+
+    const qualifiedTokens = new Set(ranked.slice(0, n).map(r=>r.token));
+    const eleves = window._elevesCache || (await getDocs(collection(fbDB, C_ELEVES))).docs.map(d=>d.data());
+    let count = 0;
+    for(const e of eleves){
+      const shouldQualify = qualifiedTokens.has(e.token);
+      try{
+        await updateDoc(doc(fbDB, C_ELEVES, e.token), { [`qualifications.${next}`]: shouldQualify });
+        if(shouldQualify) count++;
+      }catch(err){}
+    }
+
+    if(box){
+      if(!ranked.length){
+        box.innerHTML = '<div class="empty">Aucun résultat enregistré pour ce tour.</div>';
+      } else {
+        const medals=['🥇','🥈','🥉'];
+        box.innerHTML = `<div class="t2" style="margin-bottom:8px">✅ ${count} élève(s) qualifié(s) pour « ${esc(infoNext.label)} ».</div>` +
+          ranked.map((r,i)=>`
+            <div class="lb-row">
+              <div class="lb-rank">${medals[i]||(i+1)}</div>
+              <div style="flex:1">
+                <div class="lb-name">${esc(r.nom)} <span class="chip chip-indigo">${esc(r.classe||'')}</span> ${i<n?'<span class="chip chip-green">Qualifié</span>':''}</div>
+                <div class="lb-sub">${r.nbQuiz} quiz du tour · ${r.totalScore}/${r.totalMax}</div>
+              </div>
+              <div class="lb-score">${Math.round(r.pct)}%</div>
+            </div>`).join('');
+      }
+    }
+    toast(`✅ ${count} élève(s) qualifié(s) pour ${infoNext.label}.`);
+  }catch(e){
+    toast('❌ Erreur : '+e.message);
+    if(box) box.innerHTML = '<div class="empty">Erreur lors du calcul.</div>';
+  }
+};
+function renderLbForQuiz(quizId){
+  const box = document.getElementById('lbQuizBox');
+  if(!box) return;
+  if(!quizId){ box.innerHTML=''; return; }
+  const results = (window._resultsCache||[]).filter(r=>r.quizId===quizId).sort((a,b)=> b.score-a.score || a.tempsSec-b.tempsSec);
+  if(!results.length){ box.innerHTML = '<div class="empty">Aucun résultat pour ce quiz pour le moment.</div>'; return; }
+  const medals=['🥇','🥈','🥉'];
+  box.innerHTML = results.map((r,i)=>`
+    <div class="lb-row">
+      <div class="lb-rank">${medals[i]||(i+1)}</div>
+      <div style="flex:1">
+        <div class="lb-name">${esc(r.nom)} <span class="chip chip-indigo">${esc(r.classe||'')}</span></div>
+        <div class="lb-sub">⏱️ ${fmtTime(r.tempsSec)} · ${r.pourcentage}%</div>
+      </div>
+      <div class="lb-score">${r.score}/${r.total}</div>
+    </div>`).join('');
+}
+function renderLbGlobal(){
+  const box = document.getElementById('lbGlobalBox');
+  if(!box) return;
+  const results = window._resultsCache || [];
+  const byToken = {};
+  results.forEach(r=>{
+    if(!byToken[r.token]) byToken[r.token] = { nom:r.nom, classe:r.classe, totalScore:0, totalMax:0, nbQuiz:0 };
+    byToken[r.token].totalScore += r.score;
+    byToken[r.token].totalMax += r.total;
+    byToken[r.token].nbQuiz += 1;
+  });
+  const list = Object.values(byToken).sort((a,b)=> (b.totalScore/b.totalMax) - (a.totalScore/a.totalMax) || b.nbQuiz-a.nbQuiz);
+  if(!list.length){ box.innerHTML = '<div class="empty">Aucun résultat enregistré pour le moment.</div>'; return; }
+  const medals=['🥇','🥈','🥉'];
+  box.innerHTML = list.map((r,i)=>`
+    <div class="lb-row">
+      <div class="lb-rank">${medals[i]||(i+1)}</div>
+      <div style="flex:1">
+        <div class="lb-name">${esc(r.nom)} <span class="chip chip-indigo">${esc(r.classe||'')}</span></div>
+        <div class="lb-sub">${r.nbQuiz} quiz passé(s)</div>
+      </div>
+      <div class="lb-score">${Math.round(r.totalScore/r.totalMax*100)}%</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════ ESPACE ÉLÈVE ══════════════════════════════ */
+let student=null, studentToken=null, unsubStuQuiz=null, unsubStuLb=null;
+async function bootStudent(token){
+  studentToken = token;
+  try{
+    const snap = await getDoc(doc(fbDB, C_ELEVES, token));
+    if(!snap.exists()){
+      clearSavedStudentToken();
+      app.innerHTML = `<div class="center-box"><div class="icon">🔗</div><h2>Lien invalide</h2><p>Ce lien n'est plus actif. Contactez votre formateur pour obtenir un nouveau lien.</p></div>`;
+      return;
+    }
+    student = snap.data();
+  }catch(e){
+    app.innerHTML = `<div class="center-box"><div class="icon">⚠️</div><h2>Erreur de connexion</h2><p>Impossible de charger votre espace. Vérifiez votre connexion internet et réessayez.</p></div>`;
+    return;
+  }
+  renderStudentShell();
+  watchTourActif(()=>{
+    const badge = document.getElementById('tourBadgeStu');
+    if(badge) badge.textContent = tourLabel(currentTourActif);
+    if(studentTab==='quiz') renderStudentQuizList();
+  });
+}
+
+let studentTab='quiz';
+function renderStudentShell(){
+  app.innerHTML = `
+    <div class="app-header">
+      <div class="avatar">🎓</div>
+      <div class="info"><div class="name">${esc(student.nom)}</div><div class="sub">${esc(student.classe||'')}${student.filiere?' · '+esc(student.filiere):''} · Tour : <span id="tourBadgeStu">${esc(tourLabel(currentTourActif))}</span></div></div>
+      <button id="installBtn" class="install-btn hidden" onclick="doInstall()">📲 Installer</button>
+    </div>
+    <div class="tabs">
+      <button class="tab" data-t="quiz">📝 Quiz</button>
+      <button class="tab" data-t="resultats">📊 Mes résultats</button>
+      <button class="tab" data-t="classement">🏅 Classement</button>
+    </div>
+    <div id="tabBody"></div>`;
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ studentTab=b.dataset.t; paintStudentTabs(); renderStudentTab(); });
+  paintStudentTabs();
+  renderStudentTab();
+}
+function paintStudentTabs(){ app.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.t===studentTab)); }
+function renderStudentTab(){
+  if(studentTab==='quiz') renderStudentQuizList();
+  else if(studentTab==='resultats') renderStudentResults();
+  else renderStudentClassement();
+}
+
+function quizMatchesClasse(q){
+  if(!q.classe || !q.classe.trim()) return true;
+  return q.classe.trim().toLowerCase() === (student.classe||'').trim().toLowerCase();
+}
+function quizVisibleForStudent(q){
+  // Un quiz sans tour assigné (ancien quiz) reste visible quel que soit le tour actif
+  if(q.tour && q.tour !== currentTourActif) return false;
+  if(!quizMatchesClasse(q)) return false;
+  if(q.filiere && q.filiere.trim()){
+    if((student.filiere||'').trim().toUpperCase() !== q.filiere.trim().toUpperCase()) return false;
+  }
+  // À partir du 2e tour, il faut être qualifié pour ce tour précis
+  if(q.tour){
+    const idx = TOURS.findIndex(t=>t.key===q.tour);
+    if(idx>0){
+      const quals = student.qualifications||{};
+      if(!quals[q.tour]) return false;
+    }
+  }
+  return true;
+}
+
+async function renderStudentQuizList(){
+  const body = document.getElementById('tabBody');
+  body.innerHTML = `<div class="card"><div class="card-title">📝 Quiz disponibles</div><div id="stuQuizList"><div class="spinner"></div></div></div>`;
+  if(unsubStuQuiz) unsubStuQuiz();
+  unsubStuQuiz = onSnapshot(collection(fbDB, C_QUIZ), async snap=>{
+    const quizzes = snap.docs.map(d=>({id:d.id, ...d.data()})).filter(q=>q.actif && quizVisibleForStudent(q));
+    const el = document.getElementById('stuQuizList');
+    if(!el) return;
+    if(!quizzes.length){
+      const idxActif = TOURS.findIndex(t=>t.key===currentTourActif);
+      const estQualifie = idxActif<=0 || (student.qualifications && student.qualifications[currentTourActif]);
+      const msg = estQualifie
+        ? 'Aucun quiz disponible pour le moment. Revenez plus tard !'
+        : `Vous n'êtes pas (encore) qualifié(e) pour le tour « ${esc(tourLabel(currentTourActif))} ». Revenez plus tard ou contactez votre encadreur.`;
+      el.innerHTML = `<div class="empty">${msg}</div>`;
+      return;
+    }
+    const resSnap = await getDocs(query(collection(fbDB, C_RESULT), where('token','==',studentToken)));
+    const doneIds = new Set(resSnap.docs.map(d=>d.data().quizId));
+    const doneMap = {}; resSnap.docs.forEach(d=>doneMap[d.data().quizId]=d.data());
+    el.innerHTML = quizzes.map(q=>{
+      const done = doneIds.has(q.id);
+      return `<div class="row">
+        <div class="main">
+          <div class="t1">${esc(q.titre)}</div>
+          <div class="t2">${esc(q.matiere||'')} · ${q.questions.length} question(s) · ⏱️ ${q.dureeMin} min</div>
+        </div>
+        ${done
+          ? `<span class="chip chip-green">✅ ${doneMap[q.id].score}/${doneMap[q.id].total}</span>`
+          : `<button class="btn btn-primary btn-sm" onclick="startQuiz('${q.id}')">Commencer</button>`}
+      </div>`;
+    }).join('');
+  });
+}
+
+let activeQuiz=null, quizAnswers={}, quizStartTs=null, quizTimerInt=null;
+window.startQuiz = async function(quizId){
+  const snap = await getDoc(doc(fbDB, C_QUIZ, quizId));
+  if(!snap.exists()){ toast('❌ Ce quiz n\'existe plus.'); return; }
+  const already = await getDoc(doc(fbDB, C_RESULT, `${quizId}_${studentToken}`));
+  if(already.exists()){ toast('✅ Vous avez déjà participé à ce quiz.'); return; }
+  activeQuiz = { id: quizId, ...snap.data() };
+  quizAnswers = {};
+  quizStartTs = Date.now();
+  renderQuizTaking();
+};
+
+function renderQuizTaking(){
+  const body = document.getElementById('tabBody');
+  const orderMap = activeQuiz.questions.map(q=>shuffledIndices(q.options.length));
+  activeQuiz._orderMap = orderMap;
+  body.innerHTML = `
+    <div class="timer-bar" id="timerBar"><span>⏱️ Temps restant</span><span class="tval" id="timerVal">--:--</span></div>
+    <div class="card"><div class="card-title">${esc(activeQuiz.titre)}</div></div>
+    ${activeQuiz.questions.map((q,qi)=>`
+      <div class="question-card">
+        <div class="qtxt">${qi+1}. ${esc(q.q)}</div>
+        ${orderMap[qi].map(oi=>`
+          <label class="opt" data-qi="${qi}" data-oi="${oi}">
+            <input type="radio" name="quiz-q-${qi}" value="${oi}">
+            <span>${esc(q.options[oi])}</span>
+          </label>`).join('')}
+      </div>`).join('')}
+    <div class="btn-row"><button class="btn btn-primary" style="width:100%;justify-content:center" onclick="submitQuiz(false)">✅ Valider mes réponses</button></div>`;
+
+  body.querySelectorAll('.opt').forEach(lbl=>{
+    lbl.addEventListener('click', ()=>{
+      const qi = lbl.dataset.qi, oi = +lbl.dataset.oi;
+      lbl.querySelector('input').checked = true;
+      quizAnswers[qi] = oi;
+      body.querySelectorAll(`.opt[data-qi="${qi}"]`).forEach(o=>o.classList.toggle('checked', o===lbl));
+    });
+  });
+
+  const totalSec = activeQuiz.dureeMin*60;
+  clearInterval(quizTimerInt);
+  quizTimerInt = setInterval(()=>{
+    const remain = totalSec - Math.floor((Date.now()-quizStartTs)/1000);
+    const bar = document.getElementById('timerBar'), val = document.getElementById('timerVal');
+    if(!bar) { clearInterval(quizTimerInt); return; }
+    val.textContent = fmtTime(remain);
+    bar.classList.toggle('low', remain<=30);
+    if(remain<=0){ clearInterval(quizTimerInt); submitQuiz(true); }
+  }, 1000);
+}
+
+window.submitQuiz = async function(auto){
+  clearInterval(quizTimerInt);
+  const total = activeQuiz.questions.reduce((s,q)=>s+(q.points||1),0);
+  let score=0;
+  activeQuiz.questions.forEach((q,qi)=>{ if(quizAnswers[qi]===q.correct) score += (q.points||1); });
+  const dureeSec = activeQuiz.dureeMin*60;
+  const tempsSec = Math.min(dureeSec, Math.round((Date.now()-quizStartTs)/1000));
+  const pourcentage = Math.round(score/total*100);
+  const data = { quizId: activeQuiz.id, quizTitre: activeQuiz.titre, tour: activeQuiz.tour||'', token: studentToken, nom: student.nom, classe: student.classe||'', filiere: student.filiere||'', score, total, pourcentage, tempsSec, dateSoumission: Date.now() };
+  try{ await setDoc(doc(fbDB, C_RESULT, `${activeQuiz.id}_${studentToken}`), data); }
+  catch(e){ toast('❌ Erreur d\'enregistrement : '+e.message); return; }
+  const body = document.getElementById('tabBody');
+  body.innerHTML = `
+    <div class="result-hero">
+      <div style="font-size:13px;opacity:.85">${auto?'⏰ Temps écoulé — ':''}Résultat</div>
+      <div class="result-score">${score}/${total}</div>
+      <div class="result-pct">${pourcentage}% · ⏱️ ${fmtTime(tempsSec)}</div>
+    </div>
+    <div class="btn-row" style="justify-content:center">
+      <button class="btn btn-primary" onclick="studentTab='classement'; paintStudentTabs(); renderStudentTab()">🏅 Voir le classement</button>
+      <button class="btn btn-ghost" onclick="studentTab='quiz'; paintStudentTabs(); renderStudentTab()">📝 Retour aux quiz</button>
+    </div>`;
+  activeQuiz=null;
+};
+
+async function renderStudentResults(){
+  const body = document.getElementById('tabBody');
+  body.innerHTML = `<div class="card"><div class="card-title">📊 Mes résultats</div><div id="stuResList"><div class="spinner"></div></div></div>`;
+  const snap = await getDocs(query(collection(fbDB, C_RESULT), where('token','==',studentToken)));
+  const list = snap.docs.map(d=>d.data()).sort((a,b)=>b.dateSoumission-a.dateSoumission);
+  const el = document.getElementById('stuResList');
+  if(!list.length){ el.innerHTML = '<div class="empty">Vous n\'avez pas encore participé à un quiz.</div>'; return; }
+  el.innerHTML = list.map(r=>`
+    <div class="row">
+      <div class="main">
+        <div class="t1">${esc(r.quizTitre)}</div>
+        <div class="t2">${new Date(r.dateSoumission).toLocaleDateString('fr-FR')} · ⏱️ ${fmtTime(r.tempsSec)}</div>
+      </div>
+      <span class="chip chip-indigo">${r.score}/${r.total} (${r.pourcentage}%)</span>
+    </div>`).join('');
+}
+
+async function renderStudentClassement(){
+  const body = document.getElementById('tabBody');
+  const quizSnap = await getDocs(collection(fbDB, C_QUIZ));
+  const quizzes = quizSnap.docs.map(d=>({id:d.id,...d.data()})).filter(q=>quizMatchesClasse(q));
+  body.innerHTML = `
+    <div class="card">
+      <div class="card-title">🏅 Classement</div>
+      <select id="stuLbSelect"><option value="">🌍 Classement général</option>${quizzes.map(q=>`<option value="${q.id}">${esc(q.titre)}</option>`).join('')}</select>
+      <div id="stuLbBox" style="margin-top:12px"><div class="spinner"></div></div>
+    </div>`;
+  const sel = document.getElementById('stuLbSelect');
+  sel.onchange = ()=>loadStuLb(sel.value);
+  loadStuLb('');
+}
+async function loadStuLb(quizId){
+  const box = document.getElementById('stuLbBox');
+  if(!box) return;
+  box.innerHTML = '<div class="spinner"></div>';
+  if(unsubStuLb) unsubStuLb();
+  if(quizId){
+    unsubStuLb = onSnapshot(query(collection(fbDB, C_RESULT), where('quizId','==',quizId)), snap=>{
+      const results = snap.docs.map(d=>d.data()).sort((a,b)=>b.score-a.score || a.tempsSec-b.tempsSec);
+      paintLb(box, results.map(r=>({nom:r.nom, classe:r.classe, score:`${r.score}/${r.total}`, sub:`⏱️ ${fmtTime(r.tempsSec)} · ${r.pourcentage}%`, isMe:r.token===studentToken})));
+    });
+  } else {
+    unsubStuLb = onSnapshot(collection(fbDB, C_RESULT), snap=>{
+      const byToken = {};
+      snap.docs.forEach(d=>{
+        const r=d.data();
+        if(!byToken[r.token]) byToken[r.token]={ nom:r.nom, classe:r.classe, totalScore:0, totalMax:0, nbQuiz:0 };
+        byToken[r.token].totalScore+=r.score; byToken[r.token].totalMax+=r.total; byToken[r.token].nbQuiz+=1;
+      });
+      const list = Object.entries(byToken).map(([tok,v])=>({...v, tok})).sort((a,b)=>(b.totalScore/b.totalMax)-(a.totalScore/a.totalMax));
+      paintLb(box, list.map(r=>({nom:r.nom, classe:r.classe, score:`${Math.round(r.totalScore/r.totalMax*100)}%`, sub:`${r.nbQuiz} quiz passé(s)`, isMe:r.tok===studentToken})));
+    });
+  }
+}
+function paintLb(box, list){
+  if(!list.length){ box.innerHTML = '<div class="empty">Aucun résultat pour le moment.</div>'; return; }
+  const medals=['🥇','🥈','🥉'];
+  box.innerHTML = list.map((r,i)=>`
+    <div class="lb-row" style="${r.isMe?'outline:2px solid #6366f1;outline-offset:-2px':''}">
+      <div class="lb-rank">${medals[i]||(i+1)}</div>
+      <div style="flex:1">
+        <div class="lb-name">${esc(r.nom)}${r.isMe?' <span class="chip chip-indigo">Vous</span>':''} <span class="chip chip-gray">${esc(r.classe||'')}</span></div>
+        <div class="lb-sub">${r.sub}</div>
+      </div>
+      <div class="lb-score">${r.score}</div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
