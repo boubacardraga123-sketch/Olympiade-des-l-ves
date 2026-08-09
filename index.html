@@ -196,27 +196,6 @@ const params = new URLSearchParams(window.location.search);
 const studentCode = params.get('code');
 const isAdmin = params.get('admin') === '1';
 
-if (studentCode) {
-  saveStudentToken(studentCode);
-  bootStudent(studentCode);
-} else if (isAdmin) {
-  bootAdmin();
-} else {
-  const savedToken = getSavedStudentToken();
-  if (savedToken) {
-    bootStudent(savedToken);
-  } else {
-    app.innerHTML = `
-      <div class="center-box">
-        <div class="icon">🏆</div>
-        <h2>Club Réussir Ensemble</h2>
-        <p>Ce lien est personnel. Demandez à votre formateur le lien qui vous a été envoyé pour accéder à votre espace.</p>
-        <div class="btn-row" style="justify-content:center;margin-top:20px">
-          <button class="btn btn-ghost btn-sm" onclick="location.href=location.pathname+'?admin=1'">🔑 Accès formateur</button>
-        </div>
-      </div>`;
-  }
-}
 
 /* ══════════════════════════════ ADMIN ══════════════════════════════ */
 function bootAdmin(){
@@ -233,6 +212,7 @@ function bootAdmin(){
     if(sel) sel.value = currentTourActif;
   });
   watchRosterAutoSync();
+  watchResultsLive();
 }
 
 let adminTab = 'eleves';
@@ -260,6 +240,28 @@ function renderAdminTab(){
 }
 
 /* ── Élèves ── */
+let unsubResultsGlobal = null;
+function watchResultsLive(){
+  if(unsubResultsGlobal) unsubResultsGlobal();
+  unsubResultsGlobal = onSnapshot(collection(fbDB, C_RESULT), snap=>{
+    window._resultsCache = snap.docs.map(d=>d.data());
+    if(adminTab==='eleves'){
+      renderElevesListDOM();
+    } else if(adminTab==='classement'){
+      renderLbGlobal();
+      const sel = document.getElementById('lbQuizSelect');
+      if(sel && sel.value) renderLbForQuiz(sel.value);
+    }
+  });
+}
+function computeEleveScore(token){
+  const results = (window._resultsCache||[]).filter(r=>r.token===token);
+  if(!results.length) return null;
+  let totalScore=0, totalMax=0;
+  results.forEach(r=>{ totalScore += (r.score||0); totalMax += (r.total||0); });
+  return { pct: totalMax ? Math.round(totalScore/totalMax*100) : 0, nb: results.length, totalScore, totalMax };
+}
+
 let unsubEleves=null;
 function renderAdminEleves(){
   const body = document.getElementById('tabBody');
@@ -287,14 +289,25 @@ function renderAdminEleves(){
   unsubEleves = onSnapshot(collection(fbDB, C_ELEVES), snap=>{
     const list = snap.docs.map(d=>d.data()).sort((a,b)=> (a.classe||'').localeCompare(b.classe||'') || (a.nom||'').localeCompare(b.nom||''));
     window._elevesCache = list;
-    const el = document.getElementById('elevesList');
-    if(!el) return;
-    if(!list.length){ el.innerHTML = '<div class="empty">Aucun élève pour le moment.</div>'; return; }
-    el.innerHTML = list.map(e=>`
+    renderElevesListDOM();
+  });
+}
+function renderElevesListDOM(){
+  const el = document.getElementById('elevesList');
+  if(!el) return;
+  const list = window._elevesCache || [];
+  if(!list.length){ el.innerHTML = '<div class="empty">Aucun élève pour le moment.</div>'; return; }
+  el.innerHTML = list.map(e=>{
+    const sc = computeEleveScore(e.token);
+    const scoreChip = sc
+      ? `<span class="chip chip-green">🏆 ${sc.pct}% · ${sc.totalScore} pt${sc.totalScore>1?'s':''} (${sc.nb} quiz)</span>`
+      : `<span class="chip chip-gray">Pas encore de quiz</span>`;
+    return `
       <div class="row">
         <div class="main">
           <div class="t1">${esc(e.nom)} <span class="chip chip-indigo">${esc(e.classe||'—')}</span> ${e.filiere?`<span class="chip chip-indigo">${esc(e.filiere)}</span>`:''}</div>
           <div class="t2">Token : ${esc(e.token)}</div>
+          <div style="margin-top:4px">${scoreChip}</div>
           <select class="btn-sm" style="margin-top:6px;max-width:160px" onchange="setEleveFiliere('${e.token}', this.value)">
             <option value="" ${!e.filiere?'selected':''}>Filière —</option>
             <option value="SM" ${e.filiere==='SM'?'selected':''}>SM</option>
@@ -305,8 +318,8 @@ function renderAdminEleves(){
         <button class="btn btn-green btn-sm" onclick="sendEleveWA('${e.token}','${esc(e.nom).replace(/'/g,"\\'")}','${e.tel||''}')">📲</button>
         <button class="btn btn-dark btn-sm" onclick="sendEleveMail('${e.token}','${esc(e.nom).replace(/'/g,"\\'")}','${e.email||''}')">✉️</button>
         <button class="btn btn-danger btn-sm" onclick="deleteEleve('${e.token}','${esc(e.nom).replace(/'/g,"\\'")}')">🗑️</button>
-      </div>`).join('');
-  });
+      </div>`;
+  }).join('');
 }
 
 let unsubRoster = null;
@@ -943,13 +956,8 @@ function renderAdminClassement(){
       <div id="lbGlobalBox"><div class="spinner"></div></div>
     </div>`;
   document.getElementById('lbQuizSelect').onchange = e=>renderLbForQuiz(e.target.value);
-  if(unsubResAdmin) unsubResAdmin();
-  unsubResAdmin = onSnapshot(collection(fbDB, C_RESULT), snap=>{
-    window._resultsCache = snap.docs.map(d=>d.data());
-    renderLbGlobal();
-    const sel = document.getElementById('lbQuizSelect');
-    if(sel && sel.value) renderLbForQuiz(sel.value);
-  });
+  // Les résultats sont déjà écoutés en temps réel globalement (watchResultsLive) ; on rend juste depuis le cache
+  renderLbGlobal();
 }
 window.calculerQualification = async function(){
   const tourSel = document.getElementById('qualTourSelect');
@@ -1302,6 +1310,29 @@ function paintLb(box, list){
       </div>
       <div class="lb-score">${r.score}</div>
     </div>`).join('');
+}
+
+/* ══════════════════════════════ ROUTAGE (déclenché en dernier, une fois tout défini) ══════════════════════════════ */
+if (studentCode) {
+  saveStudentToken(studentCode);
+  bootStudent(studentCode);
+} else if (isAdmin) {
+  bootAdmin();
+} else {
+  const savedToken = getSavedStudentToken();
+  if (savedToken) {
+    bootStudent(savedToken);
+  } else {
+    app.innerHTML = `
+      <div class="center-box">
+        <div class="icon">🏆</div>
+        <h2>Club Réussir Ensemble</h2>
+        <p>Ce lien est personnel. Demandez à votre formateur le lien qui vous a été envoyé pour accéder à votre espace.</p>
+        <div class="btn-row" style="justify-content:center;margin-top:20px">
+          <button class="btn btn-ghost btn-sm" onclick="location.href=location.pathname+'?admin=1'">🔑 Accès formateur</button>
+        </div>
+      </div>`;
+  }
 }
 </script>
 </body>
