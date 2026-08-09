@@ -186,8 +186,48 @@ function clearSavedStudentToken(){ try{ localStorage.removeItem(LS_TOKEN_KEY); }
 
 /* ── PWA install prompt ── */
 let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; const b=document.getElementById('installBtn'); if(b) b.classList.remove('hidden'); });
-window.doInstall = async function(){ if(!deferredPrompt){ toast('📲 Utilisez le menu du navigateur : "Ajouter à l\'écran d\'accueil".'); return; } deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; };
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredPrompt=e; });
+function isStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function isIOS(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+}
+window.doInstall = async function(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if(choice && choice.outcome === 'accepted'){ dismissInstallBanner(true); }
+    return;
+  }
+  showInstallInstructions(isIOS() ? 'ios' : 'android');
+};
+window.showInstallInstructions = function(platform){
+  const old = document.getElementById('installInstructOverlay');
+  if(old) old.remove();
+  const steps = platform === 'ios'
+    ? ["Appuie sur le bouton Partager <b>⬆️</b> en bas de Safari","Fais défiler et choisis <b>« Sur l'écran d'accueil »</b>","Appuie sur <b>Ajouter</b> en haut à droite"]
+    : ["Appuie sur le menu <b>⋮</b> en haut à droite de ton navigateur","Choisis <b>« Ajouter à l'écran d'accueil »</b> ou <b>« Installer l'application »</b>","Confirme l'installation"];
+  const overlay = document.createElement('div');
+  overlay.id = 'installInstructOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:20px;max-width:340px;width:100%">
+      <div style="font-weight:800;font-size:16px;margin-bottom:10px">📲 Installer l'application</div>
+      <ol style="padding-left:18px;margin:0 0 14px 0;font-size:14px;line-height:1.8;color:#334155">
+        ${steps.map(s=>`<li>${s}</li>`).join('')}
+      </ol>
+      <button class="btn btn-primary" style="width:100%" onclick="document.getElementById('installInstructOverlay').remove()">Compris</button>
+    </div>`;
+  document.body.appendChild(overlay);
+};
+window.dismissInstallBanner = function(installed){
+  try{ sessionStorage.setItem('installBannerDismissed','1'); }catch(e){}
+  const b = document.getElementById('installBanner');
+  if(b) b.remove();
+  if(installed) toast('✅ Application installée !');
+};
 
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 
@@ -1088,12 +1128,26 @@ async function bootStudent(token){
 
 let studentTab='quiz';
 function renderStudentShell(){
+  const showInstallBanner = !isStandalone() && !sessionStorage.getItem('installBannerDismissed');
   app.innerHTML = `
     <div class="app-header">
       <div class="avatar">🎓</div>
       <div class="info"><div class="name">${esc(student.nom)}</div><div class="sub">${esc(student.classe||'')}${student.filiere?' · '+esc(student.filiere):''} · Tour : <span id="tourBadgeStu">${esc(tourLabel(currentTourActif))}</span></div></div>
-      <button id="installBtn" class="install-btn hidden" onclick="doInstall()">📲 Installer</button>
     </div>
+    ${showInstallBanner ? `
+    <div class="card" id="installBanner" style="border:2px solid #6366f1;background:linear-gradient(135deg,#eef2ff,#f5f3ff)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:30px;line-height:1">📲</div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:14.5px;color:#1e293b">Installe l'application</div>
+          <div style="font-size:12.5px;color:#64748b;margin-top:2px">Accès plus rapide à ton espace, directement depuis ton écran d'accueil.</div>
+        </div>
+        <button onclick="dismissInstallBanner()" style="background:none;border:none;font-size:18px;color:#94a3b8;cursor:pointer;padding:4px">✕</button>
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn btn-primary btn-sm" onclick="doInstall()">📲 Installer maintenant</button>
+      </div>
+    </div>` : ''}
     <div class="tabs">
       <button class="tab" data-t="quiz">📝 Quiz</button>
       <button class="tab" data-t="resultats">📊 Mes résultats</button>
